@@ -1,100 +1,102 @@
-# Ashtadisha — Gateway to the Seven Sisters 🧭
-
-> **Premium Northeast India Tourism Portal**  
-> *जहाँ कोहरा पहाड़ से मिलता है। Where Mist Meets Mountain.*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://ashtadisha.vercel.app)
+<div align="center">
+  <img src="assets/readme/header-3d.png" width="100%" alt="Ashtadisha Header" />
+  
+  # 🧭 ASHTADISHA
+  ### Gateway to the Seven Sisters of Northeast India
+  
+  [![Vercel Deployment](https://img.shields.io/badge/Live-Vercel-black?style=for-the-badge&logo=vercel)](https://ashtadisha.vercel.app)
+  [![Firebase](https://img.shields.io/badge/Powered%20By-Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
+  [![Three.js](https://img.shields.io/badge/3D%20Engine-Three.js-000000?style=for-the-badge&logo=three.js)](https://threejs.org)
+  
+  <p align="center">
+    <b>जहाँ कोहरा पहाड़ से मिलता है। Where Mist Meets Mountain.</b><br />
+    A luxury, bilingual travel portal immersive experience.
+  </p>
+</div>
 
 ---
 
-## 🗺️ About
+## 📸 Immersive Experience
 
-Ashtadisha is a bilingual (English + Hindi) luxury tourism website for Northeast India's **Seven Sister States** — Assam, Meghalaya, Nagaland, Manipur, Mizoram, Tripura, and Arunachal Pradesh.
+<div align="center">
+  <img src="assets/readme/laptop-mockup.png" width="85%" alt="Ashtadisha Workstation Mockup" />
+  <br />
+  <i>Modern. Aesthetic. Immersive. Built for the modern traveler.</i>
+</div>
+
+---
 
 ## ✨ Features
 
-- **7 State Guides** — Interactive sections with galleries, cuisine, shopping & travel tips
-- **AI Travel Planner** — Personalised itinerary suggestions
-- **Clerk Authentication** — Google / Facebook / Email sign-in
-- **Firebase Firestore** — User profiles, bookings, enquiries
-- **Razorpay Payments** — UPI, Cards, NetBanking, Wallets (INR)
-- **User Dashboard** — My Trips, Upcoming, Past Journeys, Account Settings
-- **Premium Design** — Three.js canvas, GSAP ScrollTrigger, Anime.js, dark mode, custom cursor
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Structure | Vanilla HTML5 (modular components) |
-| Styling | Vanilla CSS (no frameworks) |
-| Logic | Vanilla JavaScript (ES Modules) |
-| 3D/Animation | Three.js · GSAP · Anime.js |
-| Auth | Clerk JS |
-| Database | Firebase Firestore |
-| Storage | Firebase Storage |
-| Payments | Razorpay |
-| Hosting | Vercel |
-
-## 🚀 Running Locally
-
-```bash
-# Requires a local HTTP server (ES modules don't work via file://)
-# Option 1: Double-click run_website.bat (Windows)
-# Option 2: Python
-python -m http.server 8000
-# Option 3: Node
-npx serve .
-```
-
-Then open → `http://localhost:8000`
-
-## 📁 Project Structure
-
-```
-├── index.html              # Main SPA shell
-├── dashboard.html          # User dashboard page
-├── vercel.json             # Vercel deployment config
-├── components/             # Lazy-loaded HTML sections
-│   ├── hero.html
-│   ├── state-assam.html    # (and all 7 states)
-│   ├── booking.html
-│   └── ...
-├── css/
-│   ├── main.css            # CSS entry (imports all below)
-│   ├── global.css          # Variables + typography
-│   ├── layout.css          # Nav, footer, grid
-│   ├── auth.css            # Auth modal + avatar
-│   ├── dashboard.css       # Dashboard page
-│   └── booking-checkout.css
-├── js/
-│   ├── main.js             # App entry point
-│   ├── auth.js             # Clerk integration
-│   ├── firebase.js         # Firestore CRUD
-│   ├── payment.js          # Razorpay integration
-│   ├── booking-checkout.js # Checkout modal
-│   └── ...
-└── assets/                 # Images
-```
-
-## 🔑 Environment Keys
-
-Keys are stored directly in JS files (suitable for client-side-only projects):
-
-- **Clerk** — `js/auth.js` → `CLERK_PUBLISHABLE_KEY`
-- **Firebase** — `js/firebase.js` → `FIREBASE_CONFIG`
-- **Razorpay** — `js/payment.js` → `RZP_KEY_ID`
-
-## ☁️ Deploying to Vercel
-
-1. Push repo to GitHub
-2. Go to [vercel.com](https://vercel.com) → **Add New Project**
-3. Import `pixelpalace-coder/Ashtadisha`
-4. Framework Preset: **Other** (Static Site)
-5. Root Directory: `.` (leave as default)
-6. Click **Deploy** — done!
-
-> After deploying, add your Vercel domain to Clerk's **Allowed Origins** in the [Clerk Dashboard](https://dashboard.clerk.com).
+- 🗺️ **The Seven Sisters** — Interactive states guides for Assam, Meghalaya, Nagaland, Manipur, Mizoram, Tripura, and Arunachal Pradesh.
+- 🎨 **Aesthetic Auth** — Custom-built, glassmorphic Firebase Authentication system (Email/Social).
+- 🧠 **AI Travel Planner** — Intelligent itinerary generation for personalized journeys.
+- 💳 **Seamless Payments** — Secure Razorpay integration for instant bookings.
+- 📊 **User Dashboard** — Real-time booking management and travel history through Firestore.
+- 🕹️ **3D Visuals** — Hardware-accelerated Three.js environments and GSAP-powered motion design.
 
 ---
 
-*Built with ♥ for Northeast India*
+## 🛠️ High-End Tech Stack
+
+```mermaid
+graph TD
+    A[Frontend] --> B[Vanilla HTML5/CSS3]
+    A --> C[Three.js / WebGL]
+    A --> D[GSAP / ScrollTrigger]
+    
+    E[Services] --> F[Firebase Auth]
+    E --> G[Cloud Firestore]
+    E --> H[Razorpay API]
+    
+    I[Deployment] --> J[Vercel Edge]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style E fill:#ccf,stroke:#333,stroke-width:2px
+    style I fill:#cfc,stroke:#333,stroke-width:2px
+```
+
+---
+
+## 🚀 Dev Setup
+
+Ashtadisha uses **ES Modules** (import/export), so it requires a local server to run.
+
+```bash
+# Option 1: Double-click local-server.ps1 (Recommended for Windows)
+./server.ps1
+
+# Option 2: Python (Universal)
+python -m http.server 8000
+
+# Option 3: Node.js
+npx serve .
+```
+
+---
+
+## 📂 Architecture
+
+```text
+├── index.html              # Immersive SPA Entry
+├── dashboard.html          # Dynamic User Portal
+├── assets/
+│   ├── auth/               # Aesthetic UI Assets
+│   └── readme/             # 3D README Visuals
+├── js/
+│   ├── auth.js             # Firebase Auth Core
+│   ├── firebase.js         # Firestore & Database
+│   ├── payment.js          # Razorpay Logic
+│   └── main.js             # Three.js & UI orchestration
+└── css/
+    ├── main.css            # Modular CSS Entry
+    └── auth.css            # Glassmorphism Design
+```
+
+---
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Made%20with-♥-FF0000?style=flat-square" />
+  <br />
+  <b>Ashtadisha — Defining Northeast Tourism for the Digital Age.</b>
+</div>

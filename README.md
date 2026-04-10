@@ -63,14 +63,14 @@ graph TD
 Ashtadisha uses **ES Modules** (import/export), so it requires a local server to run.
 
 ```bash
-# Option 1: Double-click local-server.ps1 (Recommended for Windows)
-./server.ps1
+# Option 1: Double-click run_website.bat (Windows)
+# Automatically uses python server.py if available.
 
-# Option 2: Python (Universal)
+# Option 2: Python (Preferred)
+python server.py
+
+# Option 3: Manual Python server
 python -m http.server 8000
-
-# Option 3: Node.js
-npx serve .
 ```
 
 ---

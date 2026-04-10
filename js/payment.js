@@ -145,16 +145,18 @@
       },
     };
 
+    console.log('[AshtaPayment] Opening Razorpay modal for:', packageName, 'Amount:', amount);
     const rzp = new window.Razorpay(rzpOptions);
 
     // Handle payment failed event
     rzp.on('payment.failed', function (resp) {
-      console.error('[AshtaPayment] Payment failed:', resp.error);
+      console.error('[AshtaPayment] Payment failed error:', resp.error);
       // Show a user-friendly error (could be enhanced with a toast)
       alert(`Payment failed: ${resp.error.description || 'Please try again.'}`);
       if (typeof onDismiss === 'function') onDismiss();
     });
 
+    console.log('[AshtaPayment] Modal instance created. Triggering open...');
     rzp.open();
   }
 

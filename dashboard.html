@@ -23,15 +23,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
-  <!-- Clerk JS -->
-  <!-- ⚠️ Replace with your real Clerk Publishable Key -->
-  <script
-    async
-    crossorigin="anonymous"
-    data-clerk-publishable-key="pk_test_ZGFybGluZy10YWRwb2xlLTk4LmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
-    type="text/javascript">
-  </script>
+  <!-- Firebase Auth script is already in index.html, adding here for standalone dashboard usage if needed -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <!-- Razorpay (for "Book Again" flow from dashboard) -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -427,43 +420,29 @@
     /* ── Dashboard Application Logic ──────────────────────── */
     (function () {
 
-      // ── Clerk Auth Guard ─────────────────────────────────
-      function waitForClerk(retries = 30) {
-        if (!window.Clerk) {
-          if (retries > 0) setTimeout(() => waitForClerk(retries - 1), 200);
-          else showUnauthState();
+      // ── Firebase Auth Guard ─────────────────────────────────
+      function initAuth() {
+        if (!window.firebase || !firebase.auth) {
+          console.error('[Dashboard] Firebase Auth not found.');
           return;
         }
-        window.Clerk.load({ publishableKey: 'pk_test_ZGFybGluZy10YWRwb2xlLTk4LmNsZXJrLmFjY291bnRzLmRldiQ' })
-          .then(() => {
-            const user = window.Clerk.user;
-            if (!user) {
-              // Not logged in — redirect to home with login flag
-              window.location.href = 'index.html?login=1';
-              return;
-            }
+
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
             initDashboard(user);
-
-            // Listen for sign-out
-            window.Clerk.addListener(({ user }) => {
-              if (!user) window.location.href = 'index.html';
-            });
-          })
-          .catch(() => showUnauthState());
-      }
-
-      function showUnauthState() {
-        document.getElementById('dbWelcomeHeading').textContent = 'Please sign in';
-        document.getElementById('dbEmptyState').style.display = 'flex';
-        document.getElementById('tripsLoading').style.display = 'none';
+          } else {
+            // Not logged in — redirect to home with login flag
+            window.location.href = 'index.html?login=1';
+          }
+        });
       }
 
       // ── Init Dashboard ───────────────────────────────────
       async function initDashboard(user) {
-        const firstName = user.firstName || user.fullName?.split(' ')[0] || 'Traveler';
-        const fullName  = user.fullName  || firstName;
-        const email     = user.primaryEmailAddress?.emailAddress || '';
-        const photoURL  = user.imageUrl  || '';
+        const firstName = user.displayName?.split(' ')[0] || user.email.split('@')[0] || 'Traveler';
+        const fullName  = user.displayName || firstName;
+        const email     = user.email || '';
+        const photoURL  = user.photoURL || '';
 
         // Populate sidebar profile
         document.getElementById('dbUserName').textContent  = fullName;
@@ -476,13 +455,19 @@
           avatarEl.innerHTML = `<img src="${photoURL}" alt="${firstName}" loading="lazy">`;
         } else {
           avatarEl.textContent = (firstName[0] || 'T').toUpperCase();
+          avatarEl.style.background = 'linear-gradient(135deg, var(--color-primary), var(--color-accent))';
+          avatarEl.style.color = '#fff';
         }
 
         // Navbar avatar (top-right)
         const navAvatar = document.getElementById('navUserAvatar');
         const navName   = document.getElementById('navUserName');
         if (navAvatar) {
-          navAvatar.innerHTML = photoURL ? `<img src="${photoURL}" alt="">` : (firstName[0] || 'T').toUpperCase();
+          if (photoURL) {
+            navAvatar.innerHTML = `<img src="${photoURL}" alt="">`;
+          } else {
+            navAvatar.textContent = (firstName[0] || 'T').toUpperCase();
+          }
         }
         if (navName) navName.textContent = firstName;
 
@@ -491,7 +476,7 @@
         document.getElementById('settingsEmail').value = email;
 
         // Load trips from Firebase
-        await loadTrips(user.id);
+        await loadTrips(user.uid);
       }
 
       // ── Load Trips ───────────────────────────────────────
@@ -514,13 +499,16 @@
         const upcomingGrid = document.getElementById('dbUpcomingGrid');
         const pastGrid     = document.getElementById('dbPastGrid');
 
-        const now = new Date();
+        // Clear existing
+        allGrid.innerHTML = '';
+        upcomingGrid.innerHTML = '';
+        pastGrid.innerHTML = '';
 
         bookings.forEach(b => {
           const card = buildBookingCard(b);
           allGrid.insertAdjacentHTML('beforeend', card);
 
-          // Determine upcoming vs past by travelDate string
+          // Determine upcoming vs past
           const isUpcoming = b.status === 'confirmed' && b.travelDate !== 'TBD';
           if (isUpcoming) upcomingGrid.insertAdjacentHTML('beforeend', card);
           else            pastGrid.insertAdjacentHTML('beforeend',     card);
@@ -528,7 +516,9 @@
 
         // Hide empty states if there's content
         if (upcomingGrid.children.length === 0) document.getElementById('dbUpcomingEmpty').style.display = 'flex';
+        else document.getElementById('dbUpcomingEmpty').style.display = 'none';
         if (pastGrid.children.length === 0)     document.getElementById('dbPastEmpty').style.display    = 'flex';
+        else document.getElementById('dbPastEmpty').style.display = 'none';
       }
 
       // ── Build Booking Card HTML ──────────────────────────
@@ -571,51 +561,33 @@
 
       // ── Tab Switching ────────────────────────────────────
       function switchTab(tabId) {
-        // Map sidebar/mobile tabId → panel id
         const panelId = 'tab-' + tabId;
-
-        // Panels
         document.querySelectorAll('.db-tab-panel').forEach(p => p.classList.remove('active'));
         document.getElementById(panelId)?.classList.add('active');
 
-        // Desktop tab buttons
-        document.querySelectorAll('.db-tab-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.tab === tabId);
-        });
-
-        // Sidebar nav items
-        document.querySelectorAll('.db-nav-item').forEach(b => {
-          b.classList.toggle('active', b.dataset.tab === tabId);
-        });
-
-        // Mobile tab bar
-        document.querySelectorAll('.db-mobile-tab').forEach(b => {
+        document.querySelectorAll('.db-tab-btn, .db-nav-item, .db-mobile-tab').forEach(b => {
           b.classList.toggle('active', b.dataset.tab === tabId);
         });
       }
 
-      window.switchTab = switchTab; // expose for inline onclick
+      window.switchTab = switchTab;
 
-      // Bind tab buttons
       document.querySelectorAll('[data-tab]').forEach(btn => {
-        if (btn.classList.contains('db-tab-btn') ||
-            btn.classList.contains('db-nav-item') ||
-            btn.classList.contains('db-mobile-tab')) {
-          btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      // Sign Out
+      const performSignOut = async () => {
+        try {
+          await firebase.auth().signOut();
+          window.location.href = 'index.html';
+        } catch (e) {
+          console.error('[Dashboard] Sign out error:', e);
         }
-      });
+      };
 
-      // Sidebar sign out
-      document.getElementById('sideSignOut')?.addEventListener('click', async () => {
-        await window.Clerk?.signOut();
-        window.location.href = 'index.html';
-      });
-
-      // Nav dropdown sign out
-      document.getElementById('ddSignOut')?.addEventListener('click', async () => {
-        await window.Clerk?.signOut();
-        window.location.href = 'index.html';
-      });
+      document.getElementById('sideSignOut')?.addEventListener('click', performSignOut);
+      document.getElementById('ddSignOut')?.addEventListener('click', performSignOut);
 
       // Nav dropdown toggle
       const chip = document.getElementById('navUserChip');
@@ -638,7 +610,6 @@
         localStorage.setItem('ashta-theme', isDark ? 'dark' : 'light');
       });
 
-      // Restore theme
       if (localStorage.getItem('ashta-theme') === 'dark') {
         document.documentElement.classList.add('dark');
         document.getElementById('db-theme-toggle').textContent = '☾';
@@ -647,7 +618,7 @@
       // Settings form save
       document.getElementById('dbSettingsForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const user = window.Clerk?.user;
+        const user = firebase.auth().currentUser;
         if (!user) return;
 
         const data = {
@@ -683,7 +654,7 @@
       });
 
       // ── Start ────────────────────────────────────────────
-      waitForClerk();
+      initAuth();
 
       // Handle hash navigation (e.g. dashboard.html#my-trips)
       if (location.hash) {

@@ -53,21 +53,21 @@
 
   // ── saveUser ─────────────────────────────────────────────
   /**
-   * Upsert a user document in Firestore when they sign in via Clerk.
-   * @param {Object} clerkUser - The Clerk user object
+   * Upsert a user document in Firestore when they sign in via Firebase Auth.
+   * @param {Object} fbUser - The Firebase user object
    */
-  async function saveUser(clerkUser) {
+  async function saveUser(fbUser) {
     if (!initialized) { init(); if (!initialized) return; }
     try {
-      const uid = clerkUser.id;
+      const uid = fbUser.uid;
       const userRef = db.collection('users').doc(uid);
       const snap = await userRef.get();
 
       const data = {
         uid,
-        name:      clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim(),
-        email:     clerkUser.primaryEmailAddress?.emailAddress || '',
-        photoURL:  clerkUser.imageUrl || '',
+        name:      fbUser.displayName || fbUser.email.split('@')[0] || 'Traveler',
+        email:     fbUser.email || '',
+        photoURL:  fbUser.photoURL || '',
         updatedAt: now(),
       };
 
@@ -76,16 +76,16 @@
         data.createdAt     = now();
         data.totalBookings = 0;
         await userRef.set(data);
-        console.log('[AshtaFirebase] New user created:', uid);
+        console.log('[AshtaFirebase] New user created in Firestore:', uid);
       } else {
-        // Existing user — update mutable fields only
+        // Existing user — update mutable fields
         await userRef.update({
           name:      data.name,
           email:     data.email,
           photoURL:  data.photoURL,
           updatedAt: data.updatedAt,
         });
-        console.log('[AshtaFirebase] User updated:', uid);
+        console.log('[AshtaFirebase] User document updated:', uid);
       }
     } catch (e) {
       console.error('[AshtaFirebase] saveUser error:', e);

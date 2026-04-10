@@ -192,15 +192,15 @@
       amount:       total,
       bookingRef:   ref,
       packageName:  pkg.name,
-      prefillName:  user?.fullName || '',
-      prefillEmail: user?.primaryEmailAddress?.emailAddress || '',
+      prefillName:  user?.displayName || '',
+      prefillEmail: user?.email || '',
 
       onSuccess: async (rzpResponse) => {
         lastPaymentId = rzpResponse.razorpay_payment_id;
 
         // Save booking to Firebase
         const bookingData = {
-          userId:       user?.id || 'anonymous',
+          userId:       user?.uid || 'anonymous',
           packageName:  pkg.name,
           destination:  pkg.destination,
           travelers,

@@ -1,0 +1,468 @@
+.food-section {
+    background: var(--color-bg-alt);
+    padding: 80px 0 0;
+    overflow: hidden;
+}
+
+.food-scroll-outer {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) transparent;
+    padding: 2rem 24px 3rem;
+}
+
+.food-scroll-outer::-webkit-scrollbar {
+    height: 6px;
+}
+
+.food-scroll-outer::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.food-track {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+}
+
+.food-card {
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--color-surface);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--color-border);
+}
+
+.food-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.food-img-wrap {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.food-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+}
+
+.food-card:hover .food-img-wrap img {
+    transform: scale(1.06);
+}
+
+.food-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.food-badge.nonveg {
+    background: #c0392b;
+    color: #fff;
+}
+
+.food-badge.veg {
+    background: #27ae60;
+    color: #fff;
+}
+
+.state-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+}
+
+.food-info {
+    padding: 1.25rem;
+}
+
+.food-info h4 {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    margin-bottom: 0.25rem;
+}
+
+.food-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.85rem;
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.food-desc {
+    font-size: 0.85rem;
+    color: var(--color-text);
+    line-height: 1.5;
+    margin-bottom: 0.25rem;
+}
+
+.food-desc-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+}
+
+/* ── Shopping Section ── */
+.shopping-section {
+    background: var(--color-bg);
+    padding: 80px 0;
+}
+
+.shop-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 0.5rem;
+}
+
+.shop-tab {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.shop-tab.active {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.shop-tab:hover:not(.active) {
+    background: var(--color-bg-alt);
+    color: var(--color-primary);
+}
+
+.shop-panel {
+    display: none;
+}
+
+.shop-panel.active {
+    display: block;
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.shop-card {
+    background: var(--color-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.shop-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.shop-img {
+    height: 160px;
+    overflow: hidden;
+}
+
+.shop-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+}
+
+.shop-card:hover .shop-img img {
+    transform: scale(1.08);
+}
+
+.shop-card h4 {
+    font-size: 1rem;
+    padding: 1rem 1rem 0.25rem;
+    color: var(--color-primary);
+}
+
+.shop-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.8em;
+    color: var(--color-accent);
+}
+
+.shop-card p {
+    font-size: 0.85rem;
+    padding: 0 1rem 0.25rem;
+    color: var(--color-text);
+}
+
+.shop-hi-desc {
+    font-family: var(--font-hindi);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+}
+
+.shop-price {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--color-accent);
+    font-size: 0.9rem;
+    padding: 0 1rem 0.5rem;
+}
+
+.shop-state {
+    display: inline-block;
+    font-size: 0.75rem;
+    background: var(--color-bg-alt);
+    padding: 2px 8px;
+    border-radius: 20px;
+    color: var(--color-muted);
+    margin-left: 0.5rem;
+}
+
+.markets-section {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 2px solid var(--color-border);
+}
+
+.markets-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+}
+
+.markets-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.7em;
+    color: var(--color-muted);
+}
+
+.markets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.market-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.market-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.market-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.market-card h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+}
+
+.m-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.8em;
+}
+
+.market-card p {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+}
+
+/* ── Best Time Section ── */
+.when-section {
+    background: var(--color-bg-alt);
+    padding: 80px 0;
+}
+
+.month-timeline {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.month-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+}
+
+.month-item[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-primary);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    max-width: 260px;
+    white-space: normal;
+    z-index: 10;
+    width: 240px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.month-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.month-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.7rem;
+    color: var(--color-muted);
+}
+
+.month-bar {
+    width: 44px;
+    height: 60px;
+    border-radius: 4px;
+    margin-top: 4px;
+}
+
+.month-item.peak .month-bar {
+    background: var(--color-primary);
+}
+
+.month-item.good .month-bar {
+    background: #4CAF7D;
+}
+
+.month-item.moderate .month-bar {
+    background: var(--color-accent);
+    height: 40px;
+}
+
+.month-item.monsoon .month-bar {
+    background: #4A7FA5;
+    height: 25px;
+}
+
+.season-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin: 1.5rem 0 3rem;
+}
+
+.legend-item {
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.peak-leg {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.good-leg {
+    background: #4CAF7D;
+    color: #fff;
+}
+
+.moderate-leg {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+.monsoon-leg {
+    background: #4A7FA5;
+    color: #fff;
+}
+
+.festivals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.festival-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.festival-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.fest-date {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.festival-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+}
+
+.fest-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.75em;
+}
+
+.festival-card p {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+/* ── AI Planner Section ── */

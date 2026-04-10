@@ -1,0 +1,747 @@
+/* ============================================================
+   ASHTADISHA — User Dashboard
+   dashboard.css
+   ============================================================ */
+
+/* ── Dashboard Shell ── */
+.dashboard-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.dashboard-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: calc(100vh - 68px);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0;
+}
+
+/* ── Sidebar ── */
+.db-sidebar {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 2rem 0;
+  position: sticky;
+  top: 68px;
+  height: calc(100vh - 68px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+html.dark .db-sidebar {
+  background: #0A1510;
+  border-right: 1px solid rgba(76, 175, 125, 0.15);
+}
+
+.db-sidebar-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 1rem;
+}
+
+.db-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid var(--color-accent);
+  object-fit: cover;
+  margin-bottom: 1rem;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.db-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.db-user-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+.db-user-email {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+  word-break: break-all;
+}
+
+/* ── Sidebar Nav ── */
+.db-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.75rem;
+  flex: 1;
+}
+
+.db-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.db-nav-item:hover,
+.db-nav-item.active {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+.db-nav-item.active {
+  background: rgba(200, 132, 42, 0.25);
+  color: var(--color-accent);
+  border-left: 3px solid var(--color-accent);
+}
+
+html.dark .db-nav-item.active {
+  background: rgba(240, 168, 64, 0.15);
+  color: #F0A840;
+  border-left-color: #F0A840;
+}
+
+.db-nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.db-nav-item.active svg {
+  opacity: 1;
+}
+
+.db-nav-item.signout-nav {
+  color: rgba(237, 112, 112, 0.85);
+  margin-top: auto;
+  margin-bottom: 0.5rem;
+}
+
+.db-nav-item.signout-nav:hover {
+  background: rgba(237, 112, 112, 0.15);
+  color: #ED7070;
+}
+
+.db-nav-spacer {
+  flex: 1;
+}
+
+/* ── Main Content ── */
+.db-main {
+  padding: 2.5rem 2rem;
+  overflow-y: auto;
+}
+
+.db-main-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.db-main-header h1 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: var(--color-primary);
+  margin-bottom: 0.25rem;
+}
+
+.db-main-header p {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+/* ── Tab Switcher ── */
+.db-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 2rem;
+  background: var(--color-bg-alt);
+  border-radius: 10px;
+  padding: 5px;
+  width: fit-content;
+}
+
+html.dark .db-tabs {
+  background: rgba(255,255,255,0.04);
+}
+
+.db-tab-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  transition: all 0.2s;
+}
+
+.db-tab-btn.active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  font-weight: 600;
+}
+
+html.dark .db-tab-btn.active {
+  background: #1C2E22;
+  color: #4CAF7D;
+}
+
+.db-tab-panel {
+  display: none;
+}
+
+.db-tab-panel.active {
+  display: block;
+  animation: tabFadeIn 0.3s ease;
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Booking Cards ── */
+.db-bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.db-booking-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+html.dark .db-booking-card {
+  background: #1C2E22;
+  border-color: rgba(76, 175, 125, 0.15);
+}
+
+.db-booking-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+}
+
+.db-card-header {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(26,60,46,0.06), rgba(200,132,42,0.04));
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+html.dark .db-card-header {
+  background: rgba(0,0,0,0.2);
+}
+
+.db-pkg-name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.2rem;
+}
+
+html.dark .db-pkg-name {
+  color: #4CAF7D;
+}
+
+.db-destination {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+/* ── Status Badges ── */
+.db-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.db-status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-pending {
+  background: rgba(200, 132, 42, 0.12);
+  color: #C8842A;
+}
+
+.status-confirmed {
+  background: rgba(26, 60, 46, 0.1);
+  color: #1A3C2E;
+}
+
+html.dark .status-confirmed {
+  background: rgba(76, 175, 125, 0.15);
+  color: #4CAF7D;
+}
+
+.status-cancelled {
+  background: rgba(139, 58, 58, 0.1);
+  color: #8B3A3A;
+}
+
+html.dark .status-cancelled {
+  background: rgba(237, 112, 112, 0.12);
+  color: #ED7070;
+}
+
+.db-card-body {
+  padding: 1.25rem;
+}
+
+.db-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.db-card-row:last-of-type {
+  border-bottom: none;
+}
+
+.db-card-row .label {
+  color: var(--color-muted);
+}
+
+.db-card-row .value {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.db-card-row .value.amount {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.db-card-footer {
+  padding: 1rem 1.25rem;
+  background: var(--color-bg-alt);
+  display: flex;
+  gap: 0.5rem;
+}
+
+html.dark .db-card-footer {
+  background: rgba(0,0,0,0.15);
+}
+
+.db-card-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  background: transparent;
+  transition: all 0.2s;
+  text-align: center;
+  text-decoration: none;
+}
+
+.db-card-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.db-card-btn.primary {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.db-card-btn.primary:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* ── Empty State ── */
+.db-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+}
+
+.db-empty-compass {
+  width: 80px;
+  height: 80px;
+  color: var(--color-border);
+  animation: compassSpin 6s linear infinite;
+}
+
+@keyframes compassSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.db-empty-state h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+html.dark .db-empty-state h3 {
+  color: #4CAF7D;
+}
+
+.db-empty-state p {
+  color: var(--color-muted);
+  max-width: 340px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* ── Mini Package Cards (Explore More tab) ── */
+.db-explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.db-explore-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+html.dark .db-explore-card {
+  background: #1C2E22;
+  border-color: rgba(76,175,125,0.15);
+}
+
+.db-explore-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+.db-explore-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.db-explore-body {
+  padding: 1.25rem;
+}
+
+.db-explore-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.35rem;
+}
+
+.db-explore-price {
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* ── Account Settings ── */
+.db-settings-form {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.db-form-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+html.dark .db-form-section {
+  background: #1C2E22;
+  border-color: rgba(76,175,125,0.15);
+}
+
+.db-section-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+html.dark .db-section-title {
+  color: #4CAF7D;
+}
+
+.db-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.db-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.db-input-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.db-input-group label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.db-input-group input,
+.db-input-group select {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.db-input-group input:focus,
+.db-input-group select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(200,132,42,0.1);
+}
+
+/* ── Preferred States Checkboxes ── */
+.states-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.state-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.state-checkbox-label:hover {
+  border-color: var(--color-accent);
+  background: rgba(200,132,42,0.05);
+}
+
+.state-checkbox-label input[type="checkbox"]:checked + span {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.state-checkbox-label input[type="checkbox"] {
+  accent-color: var(--color-accent);
+}
+
+/* ── Travel Style Radios ── */
+.travel-style-options {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.style-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  transition: all 0.2s;
+}
+
+.style-radio-label:hover {
+  border-color: var(--color-primary);
+}
+
+.style-radio-label input[type="radio"]:checked + span {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.style-radio-label:has(input:checked) {
+  border-color: var(--color-primary);
+  background: rgba(26,60,46,0.06);
+}
+
+/* ── Save Button ── */
+.db-save-btn {
+  align-self: flex-start;
+  padding: 12px 28px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.db-save-btn:hover {
+  background: var(--color-accent);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(200,132,42,0.3);
+}
+
+/* ── Mobile: Bottom Tab Bar ── */
+@media (max-width: 768px) {
+  .dashboard-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    min-height: calc(100vh - 60px);
+  }
+
+  .db-sidebar {
+    display: none; /* hidden; replaced by bottom tab bar */
+  }
+
+  .db-main {
+    padding: 1.5rem 1rem 5rem; /* space for bottom bar */
+  }
+
+  .db-mobile-tabbar {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    z-index: 1000;
+    padding: 0;
+  }
+
+  html.dark .db-mobile-tabbar {
+    background: #1C2E22;
+  }
+
+  .db-mobile-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 4px 12px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    background: none;
+    border: none;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .db-mobile-tab.active {
+    color: var(--color-accent);
+  }
+
+  .db-mobile-tab svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .db-tabs {
+    display: none; /* hide desktop tabs on mobile */
+  }
+}
+
+/* ── Desktop: hide mobile tab bar ── */
+.db-mobile-tabbar {
+  display: none;
+}

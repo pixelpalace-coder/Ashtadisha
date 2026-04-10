@@ -1,0 +1,25 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Old/backup files
+*.old
+scripts.js.old
+styles.css.old
+
+# Node (if ever added)
+node_modules/
+npm-debug.log*
+
+# Gemini AI workspace
+.gemini/

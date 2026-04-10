@@ -1,0 +1,116 @@
+<section id="ai-planner" class="ai-planner-section">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Plan Your Dream Journey</h2>
+    <p class="section-title-hi" data-aos="fade-up" data-aos-delay="100">अपनी सपनों की यात्रा बनाएँ</p>
+    <p class="section-desc" data-aos="fade-up" data-aos-delay="150">Powered by AI. Personalised for You. / AI
+      द्वारा। आपके लिए।</p>
+    <div class="planner-layout" data-aos="fade-up" data-aos-delay="200">
+      <div class="planner-form">
+        <div class="pf-group">
+          <label class="pf-label">Which states? / <span class="pf-hi">कौन से राज्य?</span></label>
+          <div class="pill-select" id="stateSelect">
+            <button class="pill" data-val="Assam">Assam / असम</button>
+            <button class="pill" data-val="Meghalaya">Meghalaya / मेघालय</button>
+            <button class="pill" data-val="Nagaland">Nagaland / नागालैंड</button>
+            <button class="pill" data-val="Manipur">Manipur / मणिपुर</button>
+            <button class="pill" data-val="Mizoram">Mizoram / मिजोरम</button>
+            <button class="pill" data-val="Tripura">Tripura / त्रिपुरा</button>
+            <button class="pill" data-val="Arunachal Pradesh">Arunachal / अरुणाचल</button>
+          </div>
+        </div>
+        <div class="pf-group">
+          <label class="pf-label">Days: <span class="pf-days-val" id="daysVal">7</span> / <span class="pf-hi">कितने
+              दिन?</span></label>
+          <input type="range" id="daysSlider" min="3" max="30" value="7" class="pf-slider">
+        </div>
+        <div class="pf-group">
+          <label class="pf-label">Travel Style / <span class="pf-hi">यात्रा शैली?</span></label>
+          <div class="pill-select" id="styleSelect">
+            <button class="pill" data-val="Adventure">🏔 Adventure</button>
+            <button class="pill" data-val="Culture">🎭 Culture</button>
+            <button class="pill" data-val="Nature">🌿 Nature</button>
+            <button class="pill" data-val="Luxury">✨ Luxury</button>
+            <button class="pill" data-val="Budget">💰 Budget</button>
+          </div>
+        </div>
+        <div class="pf-row">
+          <div class="pf-group">
+            <label class="pf-label">Month / <span class="pf-hi">महीना?</span></label>
+            <select class="pf-select" id="monthSelect">
+              <option>January</option>
+              <option>February</option>
+              <option>March</option>
+              <option>April</option>
+              <option>May</option>
+              <option>June</option>
+              <option>July</option>
+              <option>August</option>
+              <option>September</option>
+              <option>October</option>
+              <option>November</option>
+              <option>December</option>
+            </select>
+          </div>
+          <div class="pf-group">
+            <label class="pf-label">Group / <span class="pf-hi">किसके साथ?</span></label>
+            <div class="pill-select" id="groupSelect">
+              <button class="pill" data-val="Solo">Solo</button>
+              <button class="pill" data-val="Couple">Couple</button>
+              <button class="pill" data-val="Family">Family</button>
+              <button class="pill" data-val="Group">Group</button>
+            </div>
+          </div>
+        </div>
+        <div class="pf-group">
+          <label class="pf-label">Interests / <span class="pf-hi">रुचियाँ?</span></label>
+          <div class="pill-select" id="interestSelect">
+            <button class="pill" data-val="Trekking">Trekking / ट्रेकिंग</button>
+            <button class="pill" data-val="Wildlife">Wildlife / वन्यजीव</button>
+            <button class="pill" data-val="Festivals">Festivals / त्योहार</button>
+            <button class="pill" data-val="Monasteries">Monasteries / मठ</button>
+            <button class="pill" data-val="Tribal Culture">Tribal / जनजातीय</button>
+            <button class="pill" data-val="Tea Gardens">Tea / चाय</button>
+            <button class="pill" data-val="Photography">Photo / फोटो</button>
+          </div>
+        </div>
+        <div class="pf-group">
+          <label class="pf-label">Diet / <span class="pf-hi">भोजन?</span></label>
+          <div class="pill-select" id="dietSelect">
+            <button class="pill" data-val="Vegetarian">Veg / शाकाहारी</button>
+            <button class="pill" data-val="Non-Vegetarian">Non-Veg / माँसाहारी</button>
+            <button class="pill" data-val="Vegan">Vegan / वीगन</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full planner-btn" id="generateBtn">✦ Generate My Itinerary / मेरी यात्रा
+          बनाएँ</button>
+      </div>
+      <div class="planner-output" id="plannerOutput">
+        <div class="output-placeholder" id="outputPlaceholder">
+          <div class="priya-avatar">🧭</div>
+          <h3>Meet Priya the Planner</h3>
+          <p class="priya-hi">प्रिया से मिलिए — आपकी AI यात्रा सलाहकार</p>
+          <p>Select your preferences and click Generate to receive your personalised Northeast India itinerary.</p>
+          <p class="priya-small-hi">अपनी प्राथमिकताएँ चुनें और Generate पर क्लिक करें।</p>
+        </div>
+        <div class="output-loading" id="outputLoading" style="display:none;">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+          <p>Priya is crafting your journey... / <span class="pf-hi">प्रिया आपकी यात्रा बना रही है...</span></p>
+        </div>
+        <div class="output-content" id="outputContent" style="display:none;"></div>
+        <div class="output-actions" id="outputActions" style="display:none;">
+          <button class="btn btn-primary" id="saveBtn">💾 Save Itinerary / सहेजें</button>
+          <a href="#booking" class="btn btn-outline" id="bookFromPlan">📋 Book This Tour / बुक करें</a>
+          <button class="btn btn-outline" id="regenBtn">🔄 Regenerate / पुनः बनाएँ</button>
+        </div>
+        <!-- Follow-up chat -->
+        <div class="followup-chat" id="followupChat" style="display:none;">
+          <div class="chat-history" id="chatHistory"></div>
+          <div class="chat-input-wrap">
+            <input type="text" id="chatInput" placeholder="Ask Priya anything... / प्रिया से कुछ भी पूछें...">
+            <button class="btn btn-accent" id="chatSendBtn">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

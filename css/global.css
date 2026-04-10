@@ -1,0 +1,166 @@
+/* ===================================================
+   ASHTADISHA — Complete CSS
+   =================================================== */
+:root {
+    --color-bg: #F7F3EE;
+    --color-bg-alt: #EDE8E0;
+    --color-surface: #FFFFFF;
+    --color-primary: #1A3C2E;
+    --color-accent: #C8842A;
+    --color-accent2: #8B3A3A;
+    --color-text: #1E1E1E;
+    --color-muted: #6B5F52;
+    --color-border: rgba(26, 60, 46, 0.15);
+    --color-overlay: rgba(26, 60, 46, 0.65);
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-accent: 'Playfair Display', serif;
+    --font-hindi: 'Hind', sans-serif;
+    --spacing-unit: 8px;
+    --transition-standard: 0.3s ease;
+    --max-w: 1200px;
+}
+
+html.dark {
+    --color-bg: #0E1A14;
+    --color-bg-alt: #152015;
+    --color-surface: #1C2E22;
+    --color-primary: #4CAF7D;
+    --color-accent: #F0A840;
+    --color-accent2: #ED7070;
+    --color-text: #E0E8E0;
+    --color-muted: #8FA095;
+    --color-border: rgba(76, 175, 125, 0.2);
+    --color-overlay: rgba(0, 0, 0, 0.8);
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+}
+
+.gpu-layer {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+.gpu-layer-auto {
+    will-change: auto !important;
+}
+
+/* Lenis smooth scroll compatibility */
+html.lenis {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+    transition: background-color 0.4s, color 0.4s;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a,
+button,
+select,
+input,
+textarea,
+label {
+    cursor: none;
+}
+
+::selection {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+@media (hover:none) and (pointer:coarse) {
+
+    body,
+    a,
+    button,
+    select,
+    input,
+    textarea,
+    label {
+        cursor: auto;
+    }
+}
+
+/* ── Typography ── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+p {
+    line-height: 1.7;
+}
+
+.text-accent {
+    color: var(--color-accent);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.section-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.section-title-hi {
+    font-family: var(--font-hindi);
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: var(--color-muted);
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.section-desc {
+    color: var(--color-muted);
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 3rem;
+    font-size: 1.05rem;
+}
+
+.hi,
+.pf-hi,
+.nav-hi,
+.tab-hi {
+    font-family: var(--font-hindi);
+    font-size: 0.85em;
+    opacity: 0.75;
+}
+
+/* ── Layout ── */

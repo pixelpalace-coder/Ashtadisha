@@ -318,14 +318,16 @@
       }
     }
 
-    authPre && (authPre.style.display = 'none');
+    authPre?.classList.add('hidden');
+    authPost?.classList.remove('hidden');
     authPost?.classList.add('visible');
   }
 
   function resetNavbar() {
     if (!authPre) resolveDOM();
+    authPost?.classList.add('hidden');
     authPost?.classList.remove('visible');
-    authPre && (authPre.style.display = '');
+    authPre?.classList.remove('hidden');
     closeDropdown();
   }
 

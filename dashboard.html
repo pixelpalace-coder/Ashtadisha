@@ -4,654 +4,290 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Dashboard — Ashtadisha | Northeast India Tourism</title>
-  <meta name="description" content="Manage your Northeast India travel bookings, view itineraries, and update your traveler profile on Ashtadisha.">
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Hind:wght@400;500;600&display=swap"
-    rel="stylesheet">
-
-  <!-- Core CSS -->
+  <title>Dashboard | Ashtadisha — Luxury Northeast India Tourism</title>
+  <meta name="description" content="Manage your Northeast India travel bookings, view itineraries, and update your traveler profile.">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/dashboard.css">
-
-  <!-- Firebase v9 Compat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Hind:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-  <!-- Firebase Auth script is already in index.html, adding here for standalone dashboard usage if needed -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
-  <!-- Razorpay (for "Book Again" flow from dashboard) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-  <!-- Anime.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
 </head>
 
 <body class="dashboard-page">
+  <div class="custom-cursor"><div class="cursor-dot"></div><div class="cursor-ring"></div></div>
 
-  <!-- Custom Cursor -->
-  <div class="custom-cursor">
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
-  </div>
-
-  <!-- ── Dashboard Navbar ── -->
-  <nav class="main-nav" id="mainNav" style="position:relative;backdrop-filter:none;background:var(--color-primary);border-bottom-color:rgba(255,255,255,0.1);">
-    <div class="nav-container">
-      <a href="index.html" class="logo" style="color:#fff;" aria-label="Ashtadisha Home">
-        <svg class="logo-compass" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
-          <path d="M20 0L22.8 15.2L38 20L22.8 24.8L20 40L17.2 24.8L2 20L17.2 15.2L20 0Z" fill="white" opacity="0.9" />
-          <circle cx="20" cy="20" r="3" fill="var(--color-accent)" />
-        </svg>
-        <span class="logo-text-wrap" style="color:#fff;">ASHTADISHA</span>
+  <!-- ── Dashboard Sidebar ── -->
+  <aside class="db-sidebar">
+    <div class="db-logo-section">
+      <a href="index.html" class="db-logo">
+        <svg viewBox="0 0 40 40" width="32" height="32" fill="none"><path d="M20 0L22.8 15.2L38 20L22.8 24.8L20 40L17.2 24.8L2 20L17.2 15.2L20 0Z" fill="currentColor"/><circle cx="20" cy="20" r="3" fill="var(--color-accent)"/></svg>
+        <span>ASHTADISHA</span>
       </a>
+    </div>
 
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <!-- Theme toggle (simplified for dashboard) -->
-        <button id="db-theme-toggle" aria-label="Toggle theme"
-          style="background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;">
-          ☀
-        </button>
-
-        <!-- Nav Auth (avatar) -->
-        <div class="nav-auth-post visible" id="navAuthPost" style="position:relative;">
-          <div class="nav-user-chip" id="navUserChip" role="button" aria-expanded="false" style="color:#fff;">
-            <div class="nav-avatar" id="navUserAvatar">T</div>
-            <span class="nav-user-name" id="navUserName" style="color:#fff;">Traveler</span>
-            <span class="nav-avatar-arrow" style="color:rgba(255,255,255,0.6);">▾</span>
-          </div>
-          <div class="nav-user-dropdown" id="navUserDropdown" style="background:var(--color-surface);">
-            <a href="index.html" class="nav-dropdown-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              Back to Home
-            </a>
-            <button class="nav-dropdown-item signout" id="ddSignOut">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-              Sign Out
-            </button>
-          </div>
-        </div>
+    <div class="db-user-brief">
+      <div class="db-avatar" id="dbAvatar">T</div>
+      <div class="db-user-info">
+        <h4 id="dbUserName">Loading...</h4>
+        <p id="dbUserTier">Explorer</p>
       </div>
     </div>
-  </nav>
 
-  <!-- Dashboard Layout -->
-  <div class="dashboard-body">
+    <nav class="db-nav">
+      <button class="db-nav-btn active" data-tab="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </button>
+      <button class="db-nav-btn" data-tab="trips">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        My Bookings
+      </button>
+      <button class="db-nav-btn" data-tab="explore">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        Explore More
+      </button>
+      <button class="db-nav-btn" data-tab="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Account Settings
+      </button>
+      <div class="db-nav-spacer"></div>
+      <button class="db-nav-btn signout" id="sideSignOut">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Sign Out
+      </button>
+    </nav>
+  </aside>
 
-    <!-- ── Sidebar ── -->
-    <aside class="db-sidebar" id="dbSidebar">
-      <div class="db-sidebar-profile">
-        <div class="db-avatar-large" id="dbAvatarLarge">T</div>
-        <div class="db-user-name" id="dbUserName">Traveler</div>
-        <div class="db-user-email" id="dbUserEmail">loading...</div>
+  <!-- ── Dashboard Main Content ── -->
+  <main class="db-content">
+    <header class="db-header">
+      <div class="db-header-left">
+        <h1 id="dbWelcome">Hello, Traveler</h1>
+        <p>Planning your next journey to the North East?</p>
       </div>
-
-      <nav class="db-nav" role="navigation" aria-label="Dashboard navigation">
-        <button class="db-nav-item active" data-tab="my-trips" id="sideMyTrips">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          My Trips
-        </button>
-        <button class="db-nav-item" data-tab="upcoming" id="sideUpcoming">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Upcoming
-        </button>
-        <button class="db-nav-item" data-tab="past-journeys" id="sidePast">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Past Journeys
-        </button>
-        <button class="db-nav-item" data-tab="explore" id="sideExplore">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-          Explore More
-        </button>
-        <button class="db-nav-item" data-tab="settings" id="sideSettings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-          Account Settings
-        </button>
-
-        <!-- Spacer pushes signout to bottom -->
-        <div class="db-nav-spacer"></div>
-
-        <button class="db-nav-item signout-nav" id="sideSignOut">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          Sign Out
-        </button>
-      </nav>
-    </aside>
-
-    <!-- ── Main Content ── -->
-    <main class="db-main" id="dbMain">
-      <div class="db-main-header">
-        <h1 id="dbWelcomeHeading">Welcome back, Traveler</h1>
-        <p>Your Northeast India adventures, all in one place.</p>
-      </div>
-
-      <!-- Desktop Tabs -->
-      <div class="db-tabs" role="tablist">
-        <button class="db-tab-btn active" data-tab="my-trips" role="tab">My Trips</button>
-        <button class="db-tab-btn" data-tab="explore" role="tab">Explore More</button>
-        <button class="db-tab-btn" data-tab="settings" role="tab">Account Settings</button>
-      </div>
-
-      <!-- ── Tab: My Trips ── -->
-      <div class="db-tab-panel active" id="tab-my-trips">
-        <!-- Loading state -->
-        <div id="tripsLoading" style="padding:2rem;text-align:center;color:var(--color-muted);">
-          <div style="width:48px;height:48px;border:3px solid var(--color-border);border-top-color:var(--color-accent);border-radius:50%;animation:dbSpin 0.8s linear infinite;margin:0 auto 1rem;"></div>
-          Loading your trips...
+      <div class="db-header-right">
+        <button id="themeToggle" class="db-icon-btn">☀</button>
+        <div class="db-header-profile" id="navUserChip">
+          <div class="db-header-avatar" id="navAvatar">T</div>
         </div>
+      </div>
+    </header>
 
-        <!-- Bookings grid (filled by JS) -->
-        <div class="db-bookings-grid" id="dbBookingsGrid" style="display:none;"></div>
-
-        <!-- Empty state -->
-        <div class="db-empty-state" id="dbEmptyState" style="display:none;">
-          <svg class="db-empty-compass" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 0L57 38L95 50L57 62L50 100L43 62L5 50L43 38L50 0Z" fill="currentColor" />
-            <path d="M50 15L55 45L85 50L55 55L50 85L45 55L15 50L45 45L50 15Z" fill="var(--color-accent)" />
-            <circle cx="50" cy="50" r="6" fill="var(--color-accent)" />
-          </svg>
-          <h3>Your first Northeast adventure awaits</h3>
-          <p>You haven't booked any trips yet. Explore our curated packages and start your journey through the Seven Sisters.</p>
-          <a href="index.html#booking" class="db-card-btn primary" style="align-self:center;display:inline-block;width:auto;padding:14px 28px;text-decoration:none;">
-            Explore Packages
-          </a>
+    <!-- ── Tab: Overview ── -->
+    <section class="db-tab-panel active" id="tab-overview">
+      <div class="db-stats-grid">
+        <div class="db-stat-card">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="stat-info"><h3>Upcoming</h3><p id="statUpcoming">0 Trips</p></div>
+        </div>
+        <div class="db-stat-card">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="stat-info"><h3>Completed</h3><p id="statCompleted">0 Trips</p></div>
+        </div>
+        <div class="db-stat-card">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="stat-info"><h3>Points</h3><p>Explorer</p></div>
         </div>
       </div>
 
-      <!-- ── Tab: Upcoming ── -->
-      <div class="db-tab-panel" id="tab-upcoming">
-        <div class="db-bookings-grid" id="dbUpcomingGrid"></div>
-        <div class="db-empty-state" id="dbUpcomingEmpty">
-          <svg class="db-empty-compass" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 0L57 38L95 50L57 62L50 100L43 62L5 50L43 38L50 0Z" fill="currentColor" />
-            <circle cx="50" cy="50" r="6" fill="var(--color-accent)" />
-          </svg>
-          <h3>No upcoming trips</h3>
-          <p>Your next adventure is just a booking away.</p>
-          <a href="index.html#booking" class="db-card-btn primary" style="align-self:center;display:inline-block;width:auto;padding:14px 28px;text-decoration:none;">Plan a Trip</a>
-        </div>
+      <div class="db-section-header">
+        <h2>Recent Bookings</h2>
+        <button class="text-btn" onclick="switchTab('trips')">View All →</button>
       </div>
-
-      <!-- ── Tab: Past Journeys ── -->
-      <div class="db-tab-panel" id="tab-past-journeys">
-        <div class="db-bookings-grid" id="dbPastGrid"></div>
-        <div class="db-empty-state" id="dbPastEmpty">
-          <svg class="db-empty-compass" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 0L57 38L95 50L57 62L50 100L43 62L5 50L43 38L50 0Z" fill="currentColor" />
-            <circle cx="50" cy="50" r="6" fill="var(--color-accent)" />
-          </svg>
-          <h3>No past journeys yet</h3>
-          <p>Your travel memories will appear here after your trips are completed.</p>
-        </div>
+      <div id="overviewBookings" class="db-grid">
+        <!-- Rendered by JS -->
       </div>
+    </section>
 
-      <!-- ── Tab: Explore More ── -->
-      <div class="db-tab-panel" id="tab-explore">
-        <h2 style="font-family:var(--font-display);color:var(--color-primary);font-size:1.4rem;margin-bottom:0.5rem;">Discover More</h2>
-        <p style="color:var(--color-muted);font-size:0.9rem;margin-bottom:1.5rem;">Our most-loved Northeast India packages</p>
-        <div class="db-explore-grid">
-
-          <div class="db-explore-card">
-            <img class="db-explore-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=70" alt="The Complete 7 Sisters" loading="lazy">
-            <div class="db-explore-body">
-              <div class="db-explore-name">The Complete 7 Sisters</div>
-              <p style="font-size:0.8rem;color:var(--color-muted);margin-bottom:.5rem;">14 Days · All 7 States</p>
-              <div class="db-explore-price">From ₹85,000/person</div>
-              <button class="db-card-btn primary" onclick="window.AshtaCheckout?.open('complete')">Book This Package</button>
-            </div>
-          </div>
-
-          <div class="db-explore-card">
-            <img class="db-explore-img" src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=600&q=70" alt="Assam + Meghalaya" loading="lazy">
-            <div class="db-explore-body">
-              <div class="db-explore-name">Assam + Meghalaya</div>
-              <p style="font-size:0.8rem;color:var(--color-muted);margin-bottom:.5rem;">7 Days · Tea gardens + Root Bridges</p>
-              <div class="db-explore-price">From ₹42,000/person</div>
-              <button class="db-card-btn primary" onclick="window.AshtaCheckout?.open('assam_megh')">Book This Package</button>
-            </div>
-          </div>
-
-          <div class="db-explore-card">
-            <img class="db-explore-img" src="https://images.unsplash.com/photo-1543158181-e6f9f6712055?auto=format&fit=crop&w=600&q=70" alt="Arunachal Monastery Trek" loading="lazy">
-            <div class="db-explore-body">
-              <div class="db-explore-name">Arunachal Monastery Trek</div>
-              <p style="font-size:0.8rem;color:var(--color-muted);margin-bottom:.5rem;">9 Days · Tawang + Ziro Valley</p>
-              <div class="db-explore-price">From ₹55,000/person</div>
-              <button class="db-card-btn primary" onclick="window.AshtaCheckout?.open('arunachal')">Book This Package</button>
-            </div>
-          </div>
-
-        </div>
+    <!-- ── Tab: Trips ── -->
+    <section class="db-tab-panel" id="tab-trips">
+      <div class="db-section-header">
+        <h2>My Journeys</h2>
       </div>
-
-      <!-- ── Tab: Account Settings ── -->
-      <div class="db-tab-panel" id="tab-settings">
-        <form class="db-settings-form" id="dbSettingsForm" onsubmit="return false;">
-
-          <!-- Personal Info -->
-          <div class="db-form-section">
-            <div class="db-section-title">Personal Information</div>
-            <div class="db-form-grid">
-              <div class="db-input-group">
-                <label for="settingsName">Full Name</label>
-                <input type="text" id="settingsName" placeholder="Your full name">
-              </div>
-              <div class="db-input-group">
-                <label for="settingsEmail">Email</label>
-                <input type="email" id="settingsEmail" placeholder="your@email.com" readonly
-                  style="opacity:0.6;cursor:not-allowed;" title="Email is managed by Clerk">
-              </div>
-              <div class="db-input-group">
-                <label for="settingsPhone">Phone</label>
-                <input type="tel" id="settingsPhone" placeholder="+91 98765 43210">
-              </div>
-              <div class="db-input-group">
-                <label for="settingsCity">City</label>
-                <input type="text" id="settingsCity" placeholder="Mumbai, Delhi...">
-              </div>
-            </div>
-          </div>
-
-          <!-- Travel Preferences -->
-          <div class="db-form-section">
-            <div class="db-section-title">Travel Style</div>
-            <div class="travel-style-options">
-              <label class="style-radio-label">
-                <input type="radio" name="travelStyle" value="solo"> <span>Solo Explorer</span>
-              </label>
-              <label class="style-radio-label">
-                <input type="radio" name="travelStyle" value="couple"> <span>Couple</span>
-              </label>
-              <label class="style-radio-label">
-                <input type="radio" name="travelStyle" value="family"> <span>Family</span>
-              </label>
-              <label class="style-radio-label">
-                <input type="radio" name="travelStyle" value="group"> <span>Group</span>
-              </label>
-              <label class="style-radio-label">
-                <input type="radio" name="travelStyle" value="adventure" checked> <span>Adventure Seeker</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Preferred States -->
-          <div class="db-form-section">
-            <div class="db-section-title">Preferred States</div>
-            <p style="font-size:0.82rem;color:var(--color-muted);margin-bottom:0.75rem;">Select the states you'd most like to explore</p>
-            <div class="states-checkbox-grid">
-              <label class="state-checkbox-label"><input type="checkbox" name="states" value="assam"> <span>🟠 Assam</span></label>
-              <label class="state-checkbox-label"><input type="checkbox" name="states" value="meghalaya"> <span>🔵 Meghalaya</span></label>
-              <label class="state-checkbox-label"><input type="checkbox" name="states" value="nagaland"> <span>🔴 Nagaland</span></label>
-              <label class="state-checkbox-label"><input type="checkbox" name="states" value="manipur"> <span>🟣 Manipur</span></label>
-              <label class="state-checkbox-label"><input type="checkbox" name="states" value="mizoram"> <span>🟢 Mizoram</span></label>
-              <label class="state-checkbox-label"><input type="checkbox" name="states" value="tripura"> <span>🟡 Tripura</span></label>
-              <label class="state-checkbox-label"><input type="checkbox" name="states" value="arunachal"> <span>⬛ Arunachal</span></label>
-            </div>
-          </div>
-
-          <button type="submit" class="db-save-btn" id="dbSaveProfile">Save Changes</button>
-          <p id="dbSaveStatus" style="font-size:0.82rem;color:var(--color-muted);display:none;margin-top:0.5rem;"></p>
-        </form>
+      <div id="tripsList" class="db-list">
+        <!-- Rendered by JS -->
       </div>
+    </section>
 
-    </main><!-- /db-main -->
-  </div><!-- /dashboard-body -->
-
-  <!-- ── Mobile Bottom Tab Bar ── -->
-  <div class="db-mobile-tabbar" role="navigation" aria-label="Dashboard navigation">
-    <button class="db-mobile-tab active" data-tab="my-trips">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      My Trips
-    </button>
-    <button class="db-mobile-tab" data-tab="upcoming">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Upcoming
-    </button>
-    <button class="db-mobile-tab" data-tab="explore">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-      Explore
-    </button>
-    <button class="db-mobile-tab" data-tab="settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      Settings
-    </button>
-  </div>
-
-  <!-- ── Checkout Modal (re-used from main site for "Book Again") ── -->
-  <!-- Checkout overlay HTML is duplicated here for dashboard standalone usage -->
-  <div class="checkout-overlay" id="checkoutOverlay" role="dialog" aria-modal="true">
-    <div class="checkout-modal" id="checkoutModal">
-      <div class="checkout-header">
-        <h2 class="checkout-title">Book Your Journey</h2>
-        <button class="checkout-close" id="checkoutClose" aria-label="Close">✕</button>
+    <!-- ── Tab: Explore ── -->
+    <section class="db-tab-panel" id="tab-explore">
+      <div class="db-section-header">
+        <h2>Curated Experiences</h2>
+        <p>Dynamic pricing fetched from our premium collection.</p>
       </div>
-      <div class="checkout-steps">
-        <div class="co-step active" data-step="1"><span class="co-step-num">1</span><span class="co-step-label">Trip Details</span></div>
-        <div class="co-step" data-step="2"><span class="co-step-num">2</span><span class="co-step-label">Payment</span></div>
-        <div class="co-step" data-step="3"><span class="co-step-num">3</span><span class="co-step-label">Confirmed</span></div>
+      <div id="exploreGrid" class="db-grid">
+        <!-- Rendered by JS -->
       </div>
-      <div class="checkout-panels">
-        <div class="co-panel active" data-step="1">
-          <div class="co-package-summary">
-            <img class="co-pkg-icon" id="coPkgImg" src="" alt="">
-            <div class="co-pkg-info"><h3 id="coPkgName">—</h3><p id="coPkgDuration">—</p></div>
-            <div class="co-pkg-price-tag"><span class="price" id="coPkgPrice">₹0</span><span class="per-person">per person</span></div>
+    </section>
+
+    <!-- ── Tab: Settings ── -->
+    <section class="db-tab-panel" id="tab-settings">
+      <div class="db-section-header">
+        <h2>Account Settings</h2>
+      </div>
+      <form class="db-form card" id="settingsForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Display Name</label>
+            <input type="text" id="setName" placeholder="Full Name">
           </div>
-          <div class="co-field-group">
-            <label class="co-field-label">Number of Travelers</label>
-            <div class="traveler-stepper">
-              <button class="stepper-btn" id="coTravelerMinus">−</button>
-              <span class="stepper-value" id="coTravelerCount">2</span>
-              <button class="stepper-btn" id="coTravelerPlus">+</button>
-            </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="setPhone" placeholder="+91 90000 00000">
           </div>
-          <div class="co-field-group">
-            <label class="co-field-label" for="coTravelMonth">Preferred Travel Month</label>
-            <select class="co-input" id="coTravelMonth">
-              <option value="">— Select Month —</option>
-              <option>January</option><option>February</option><option>March</option>
-              <option>April</option><option>May</option><option>June</option>
-              <option>July</option><option>August</option><option>September</option>
-              <option>October</option><option>November</option><option>December</option>
-            </select>
+          <div class="form-group">
+            <label>Primary City</label>
+            <input type="text" id="setCity" placeholder="City">
           </div>
-          <div class="co-field-group">
-            <label class="co-field-label" for="coSpecialReqs">Special Requests</label>
-            <textarea class="co-input" id="coSpecialReqs" rows="2" placeholder="Dietary needs, accessibility..."></textarea>
-          </div>
-          <div class="co-total-display">
-            <div><div class="co-total-label">Estimated Total</div></div>
-            <div class="co-total-amount" id="coTotalAmount">₹0</div>
-          </div>
-          <div class="co-step-nav" style="justify-content:flex-end;">
-            <button class="co-btn-next" id="coNext1">Proceed to Payment →</button>
+          <div class="form-group">
+            <label>Profile Image URL</label>
+            <input type="url" id="setPhoto" placeholder="https://...">
           </div>
         </div>
-        <div class="co-panel" data-step="2">
-          <div class="co-order-recap">
-            <div class="co-recap-row"><span class="rLabel">Package</span><span id="coRecapPkg">—</span></div>
-            <div class="co-recap-row"><span class="rLabel">Travelers</span><span id="coRecapTravelers">—</span></div>
-            <div class="co-recap-row"><span class="rLabel">Month</span><span id="coRecapMonth">—</span></div>
-            <div class="co-recap-row"><span class="rLabel"><strong>Total</strong></span><span id="coRecapTotal" style="color:var(--color-accent);font-weight:700;">—</span></div>
-          </div>
-          <button class="co-pay-btn" id="coPayBtn">Pay ₹0</button>
-          <div class="co-trust-badges">
-            <span class="co-trust-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>SSL Secured</span>
-            <span class="co-trust-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Razorpay Certified</span>
-          </div>
-          <div class="co-step-nav"><button class="co-btn-back" id="coBack2">← Back</button></div>
-        </div>
-        <div class="co-panel" data-step="3">
-          <div class="co-confirm-panel">
-            <div id="coCheckAnimContainer"></div>
-            <h3 class="co-confirm-heading">Booking Confirmed!</h3>
-            <p class="co-confirm-sub">Our team will contact you within 24 hours to finalise your itinerary.</p>
-            <div class="co-booking-id" id="coBookingId">Booking Ref: —</div>
-            <div class="co-confirm-actions">
-              <button class="co-action-btn primary" onclick="document.getElementById('checkoutOverlay').classList.remove('active');document.body.style.overflow='';switchTab('my-trips');">View My Trips</button>
-              <button class="co-action-btn outline" id="coDownloadBtn">⬇ Download</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <button type="submit" class="btn-primary">Update Profile</button>
+        <p id="saveStatus" class="status-msg"></p>
+      </form>
+    </section>
+  </main>
 
-  <!-- ═══ Scripts ═══ -->
+  <!-- ═══ Custom Modal Overlay for Checkout ═══ -->
+  <div class="checkout-overlay" id="checkoutOverlay"></div>
+
+  <!-- ═══ Initialization ═══ -->
   <script src="js/firebase.js"></script>
   <script src="js/payment.js"></script>
   <script src="js/booking-checkout.js"></script>
 
-  <style>
-    /* Dashboard-specific keyframes */
-    @keyframes dbSpin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-  </style>
-
   <script>
-    /* ── Dashboard Application Logic ──────────────────────── */
     (function () {
+      'use strict';
 
-      // ── Firebase Auth Guard ─────────────────────────────────
-      function initAuth() {
-        if (!window.firebase || !firebase.auth) {
-          console.error('[Dashboard] Firebase Auth not found.');
+      let userUID = null;
+
+      // 1. Auth Guard
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) {
+          window.location.href = 'index.html?login=1';
           return;
         }
+        userUID = user.uid;
+        initDashboard(user);
+      });
 
-        firebase.auth().onAuthStateChanged((user) => {
-          if (user) {
-            initDashboard(user);
-          } else {
-            // Not logged in — redirect to home with login flag
-            window.location.href = 'index.html?login=1';
-          }
+      // 2. Dashboard Logic
+      async function initDashboard(fbUser) {
+        // Fetch full profile from Firestore (Source of Truth)
+        const userDoc = await firebase.firestore().collection('users').doc(fbUser.uid).get();
+        const userData = userDoc.exists ? userDoc.data() : {};
+        const displayName = userData.name || fbUser.displayName || 'Traveler';
+        const firstName = displayName.split(' ')[0];
+
+        // Update UI
+        document.getElementById('dbUserName').textContent = displayName;
+        document.getElementById('dbWelcome').textContent = `Namaste, ${firstName}`;
+        document.getElementById('dbAvatar').textContent = firstName[0].toUpperCase();
+        document.getElementById('navAvatar').textContent = firstName[0].toUpperCase();
+        
+        // Populate inputs
+        document.getElementById('setName').value = displayName;
+        document.getElementById('setPhone').value = userData.phone || '';
+        document.getElementById('setCity').value = userData.city || '';
+        document.getElementById('setPhoto').value = userData.photoURL || '';
+
+        // Load dynamic packages
+        loadPackages();
+        // Load bookings
+        loadBookings();
+      }
+
+      async function loadPackages() {
+        const grid = document.getElementById('exploreGrid');
+        if (!grid) return;
+        grid.innerHTML = '<div class="loader">Fetching experiences...</div>';
+        
+        const packages = await window.AshtaFirebase.getPackages();
+        grid.innerHTML = '';
+        
+        Object.values(packages).forEach(pkg => {
+          const card = `
+            <div class="db-card">
+              <div class="db-card-img" style="background-image:url('${pkg.image}')"></div>
+              <div class="db-card-content">
+                <h3>${pkg.name}</h3>
+                <p>${pkg.duration}</p>
+                <div class="db-card-footer">
+                  <span class="price">₹${pkg.pricePerPerson.toLocaleString()}</span>
+                  <button class="btn-primary btn-sm" onclick="window.AshtaCheckout.open('${pkg.id}')">Book</button>
+                </div>
+              </div>
+            </div>`;
+          grid.insertAdjacentHTML('beforeend', card);
         });
       }
 
-      // ── Init Dashboard ───────────────────────────────────
-      async function initDashboard(user) {
-        const firstName = user.displayName?.split(' ')[0] || user.email.split('@')[0] || 'Traveler';
-        const fullName  = user.displayName || firstName;
-        const email     = user.email || '';
-        const photoURL  = user.photoURL || '';
-
-        // Populate sidebar profile
-        document.getElementById('dbUserName').textContent  = fullName;
-        document.getElementById('dbUserEmail').textContent = email;
-        document.getElementById('dbWelcomeHeading').textContent = `Welcome back, ${firstName}`;
-
-        // Avatar
-        const avatarEl = document.getElementById('dbAvatarLarge');
-        if (photoURL) {
-          avatarEl.innerHTML = `<img src="${photoURL}" alt="${firstName}" loading="lazy">`;
-        } else {
-          avatarEl.textContent = (firstName[0] || 'T').toUpperCase();
-          avatarEl.style.background = 'linear-gradient(135deg, var(--color-primary), var(--color-accent))';
-          avatarEl.style.color = '#fff';
-        }
-
-        // Navbar avatar (top-right)
-        const navAvatar = document.getElementById('navUserAvatar');
-        const navName   = document.getElementById('navUserName');
-        if (navAvatar) {
-          if (photoURL) {
-            navAvatar.innerHTML = `<img src="${photoURL}" alt="">`;
-          } else {
-            navAvatar.textContent = (firstName[0] || 'T').toUpperCase();
-          }
-        }
-        if (navName) navName.textContent = firstName;
-
-        // Pre-fill settings form
-        document.getElementById('settingsName').value  = fullName;
-        document.getElementById('settingsEmail').value = email;
-
-        // Load trips from Firebase
-        await loadTrips(user.uid);
-      }
-
-      // ── Load Trips ───────────────────────────────────────
-      async function loadTrips(uid) {
-        const bookings = await window.AshtaFirebase?.getUserBookings(uid) || [];
-
-        document.getElementById('tripsLoading').style.display = 'none';
-
+      async function loadBookings() {
+        const bookings = await window.AshtaFirebase.getUserBookings(userUID);
+        const overviewGrid = document.getElementById('overviewBookings');
+        const tripsList = document.getElementById('tripsList');
+        
+        document.getElementById('statUpcoming').textContent = `${bookings.filter(b => b.status === 'confirmed').length} Trips`;
+        
         if (bookings.length === 0) {
-          document.getElementById('dbEmptyState').style.display  = 'flex';
-          document.getElementById('dbUpcomingEmpty').style.display = 'flex';
-          document.getElementById('dbPastEmpty').style.display   = 'flex';
+          const empty = '<p class="empty">No bookings found yet. Start exploring the Seven Sisters!</p>';
+          overviewGrid.innerHTML = empty;
+          tripsList.innerHTML = empty;
           return;
         }
 
-        document.getElementById('dbBookingsGrid').style.display = 'grid';
-        document.getElementById('dbEmptyState').style.display   = 'none';
-
-        const allGrid      = document.getElementById('dbBookingsGrid');
-        const upcomingGrid = document.getElementById('dbUpcomingGrid');
-        const pastGrid     = document.getElementById('dbPastGrid');
-
-        // Clear existing
-        allGrid.innerHTML = '';
-        upcomingGrid.innerHTML = '';
-        pastGrid.innerHTML = '';
+        overviewGrid.innerHTML = '';
+        tripsList.innerHTML = '';
 
         bookings.forEach(b => {
-          const card = buildBookingCard(b);
-          allGrid.insertAdjacentHTML('beforeend', card);
-
-          // Determine upcoming vs past
-          const isUpcoming = b.status === 'confirmed' && b.travelDate !== 'TBD';
-          if (isUpcoming) upcomingGrid.insertAdjacentHTML('beforeend', card);
-          else            pastGrid.insertAdjacentHTML('beforeend',     card);
-        });
-
-        // Hide empty states if there's content
-        if (upcomingGrid.children.length === 0) document.getElementById('dbUpcomingEmpty').style.display = 'flex';
-        else document.getElementById('dbUpcomingEmpty').style.display = 'none';
-        if (pastGrid.children.length === 0)     document.getElementById('dbPastEmpty').style.display    = 'flex';
-        else document.getElementById('dbPastEmpty').style.display = 'none';
-      }
-
-      // ── Build Booking Card HTML ──────────────────────────
-      function buildBookingCard(b) {
-        const statusClass = b.status === 'confirmed' ? 'status-confirmed'
-                          : b.status === 'cancelled' ? 'status-cancelled'
-                          : 'status-pending';
-        const statusLabel = b.status || 'pending';
-        const amount = b.totalAmount
-          ? new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(b.totalAmount)
-          : '—';
-        return `
-          <div class="db-booking-card">
-            <div class="db-card-header">
-              <div>
-                <div class="db-pkg-name">${sanitize(b.packageName || '—')}</div>
-                <div class="db-destination">${sanitize(b.destination || '—')}</div>
+          const item = `
+            <div class="db-list-item">
+              <div class="item-info">
+                <h4>${b.packageName}</h4>
+                <p>${b.bookingRef} · ${b.travelDate}</p>
               </div>
-              <span class="db-status-badge ${statusClass}">${statusLabel}</span>
-            </div>
-            <div class="db-card-body">
-              <div class="db-card-row"><span class="label">Booking Ref</span><span class="value">${sanitize(b.bookingRef || b.id || '—')}</span></div>
-              <div class="db-card-row"><span class="label">Travel Date</span><span class="value">${sanitize(b.travelDate || '—')}</span></div>
-              <div class="db-card-row"><span class="label">Travelers</span><span class="value">${b.travelers || '—'}</span></div>
-              <div class="db-card-row"><span class="label">Total Paid</span><span class="value amount">${amount}</span></div>
-            </div>
-            <div class="db-card-footer">
-              <button class="db-card-btn" onclick="alert('Itinerary feature coming soon!')">View Itinerary</button>
-              <button class="db-card-btn primary" onclick="window.AshtaCheckout?.open('${sanitize(b.packageKey || 'complete')}')">Book Again</button>
-            </div>
-          </div>`;
-      }
-
-      // ── Sanitize HTML ────────────────────────────────────
-      function sanitize(str) {
-        const d = document.createElement('div');
-        d.textContent = String(str);
-        return d.innerHTML;
-      }
-
-      // ── Tab Switching ────────────────────────────────────
-      function switchTab(tabId) {
-        const panelId = 'tab-' + tabId;
-        document.querySelectorAll('.db-tab-panel').forEach(p => p.classList.remove('active'));
-        document.getElementById(panelId)?.classList.add('active');
-
-        document.querySelectorAll('.db-tab-btn, .db-nav-item, .db-mobile-tab').forEach(b => {
-          b.classList.toggle('active', b.dataset.tab === tabId);
+              <div class="item-status status-${b.status}">${b.status}</div>
+              <div class="item-price">₹${b.totalAmount.toLocaleString()}</div>
+            </div>`;
+          
+          if (overviewGrid.children.length < 3) overviewGrid.insertAdjacentHTML('beforeend', item);
+          tripsList.insertAdjacentHTML('beforeend', item);
         });
       }
 
-      window.switchTab = switchTab;
+      // 3. Tab Switching
+      window.switchTab = (tabId) => {
+        document.querySelectorAll('.db-tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        document.querySelectorAll('.db-nav-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.tab === tabId);
+        });
+      };
 
-      document.querySelectorAll('[data-tab]').forEach(btn => {
+      document.querySelectorAll('.db-nav-btn[data-tab]').forEach(btn => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
       });
 
-      // Sign Out
-      const performSignOut = async () => {
-        try {
-          await firebase.auth().signOut();
-          window.location.href = 'index.html';
-        } catch (e) {
-          console.error('[Dashboard] Sign out error:', e);
-        }
-      };
-
-      document.getElementById('sideSignOut')?.addEventListener('click', performSignOut);
-      document.getElementById('ddSignOut')?.addEventListener('click', performSignOut);
-
-      // Nav dropdown toggle
-      const chip = document.getElementById('navUserChip');
-      const drop = document.getElementById('navUserDropdown');
-      chip?.addEventListener('click', () => {
-        drop?.classList.toggle('open');
-        chip.setAttribute('aria-expanded', drop?.classList.contains('open'));
-      });
-      document.addEventListener('click', e => {
-        if (!chip?.contains(e.target) && !drop?.contains(e.target)) {
-          drop?.classList.remove('open');
-        }
-      });
-
-      // Theme toggle
-      document.getElementById('db-theme-toggle')?.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-        const isDark = document.documentElement.classList.contains('dark');
-        document.getElementById('db-theme-toggle').textContent = isDark ? '☾' : '☀';
-        localStorage.setItem('ashta-theme', isDark ? 'dark' : 'light');
-      });
-
-      if (localStorage.getItem('ashta-theme') === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.getElementById('db-theme-toggle').textContent = '☾';
-      }
-
-      // Settings form save
-      document.getElementById('dbSettingsForm')?.addEventListener('submit', async (e) => {
+      // 4. Update Profile
+      document.getElementById('settingsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const user = firebase.auth().currentUser;
-        if (!user) return;
-
+        const status = document.getElementById('saveStatus');
+        status.textContent = 'Updating...';
+        
         const data = {
-          name:         document.getElementById('settingsName').value.trim(),
-          phone:        document.getElementById('settingsPhone').value.trim(),
-          city:         document.getElementById('settingsCity').value.trim(),
-          travelStyle:  document.querySelector('input[name="travelStyle"]:checked')?.value || '',
-          preferredStates: [...document.querySelectorAll('input[name="states"]:checked')].map(c => c.value),
+          name: document.getElementById('setName').value.trim(),
+          phone: document.getElementById('setPhone').value.trim(),
+          city: document.getElementById('setCity').value.trim(),
+          photoURL: document.getElementById('setPhoto').value.trim()
         };
 
-        const statusEl = document.getElementById('dbSaveStatus');
-        statusEl.style.display = 'block';
-        statusEl.textContent   = 'Saving...';
-
-        await window.AshtaFirebase?.updateUserProfile(user.id, data);
-
-        statusEl.textContent = '✓ Profile saved successfully.';
-        statusEl.style.color = 'var(--color-primary)';
-        setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
-      });
-
-      // Custom cursor
-      const dot  = document.querySelector('.cursor-dot');
-      const ring = document.querySelector('.cursor-ring');
-      const cur  = document.querySelector('.custom-cursor');
-      document.addEventListener('mousemove', e => {
-        if (dot)  { dot.style.left  = e.clientX + 'px'; dot.style.top  = e.clientY + 'px'; }
-        if (ring) { ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px'; }
-      });
-      document.querySelectorAll('a, button').forEach(el => {
-        el.addEventListener('mouseenter', () => cur?.classList.add('hovering'));
-        el.addEventListener('mouseleave', () => cur?.classList.remove('hovering'));
-      });
 
       // ── Start ────────────────────────────────────────────
       initAuth();

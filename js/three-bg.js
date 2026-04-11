@@ -65,7 +65,8 @@ export function initThreeJS() {
             return system;
         }
 
-        // 1. Initialize Hero
+        // 1. Initialize Hero (Disabled in favor of js/globe.js)
+        /*
         const heroCanvas = document.getElementById('heroCanvas');
         let heroSystem = initParticleSystem(heroCanvas, HERO_PARTICLES, 0xC8842A, 0.02, 0.6, 12);
         if (heroSystem) {
@@ -82,6 +83,7 @@ export function initThreeJS() {
                 heroSystem.renderer.render(heroSystem.scene, heroSystem.camera);
             };
         }
+        */
 
         // 2. Initialize Footer
         const footerCanvas = document.getElementById('footerCanvas');

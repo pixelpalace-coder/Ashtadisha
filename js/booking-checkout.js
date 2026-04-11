@@ -12,43 +12,54 @@
   'use strict';
 
   // ── Package Data ─────────────────────────────────────────
-  const PACKAGES = {
-    complete: {
-      name:        'The Complete 7 Sisters',
-      destination: 'All 7 Northeast States',
-      duration:    '14 Days · 13 Nights',
-      pricePerPerson: 85000,
-      image:       'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=80&q=70',
-    },
-    assam_megh: {
-      name:        'Assam + Meghalaya',
-      destination: 'Assam & Meghalaya',
-      duration:    '7 Days · 6 Nights',
-      pricePerPerson: 42000,
-      image:       'https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=80&q=70',
-    },
-    arunachal: {
-      name:        'Arunachal Monastery Trek',
-      destination: 'Arunachal Pradesh',
-      duration:    '9 Days · 8 Nights',
-      pricePerPerson: 55000,
-      image:       'https://images.unsplash.com/photo-1543158181-e6f9f6712055?auto=format&fit=crop&w=80&q=70',
-    },
-    hornbill: {
-      name:        'Hornbill Festival Special',
-      destination: 'Nagaland',
-      duration:    '5 Days · 4 Nights',
-      pricePerPerson: 38000,
-      image:       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=80&q=70',
-    },
-    wildlife: {
-      name:        'Wildlife & Safari Circuit',
-      destination: 'Assam, Arunachal Pradesh',
-      duration:    '10 Days · 9 Nights',
-      pricePerPerson: 62000,
-      image:       'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=80&q=70',
-    },
-  };
+  // Initialized from Firestore
+  let PACKAGES = {};
+
+  async function initPackages() {
+    try {
+      if (window.AshtaFirebase && typeof window.AshtaFirebase.getPackages === 'function') {
+        const fetched = await window.AshtaFirebase.getPackages();
+        if (fetched && Object.keys(fetched).length > 0) {
+          PACKAGES = fetched;
+          console.log('[AshtaCheckout] Packages loaded from Firestore:', PACKAGES);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[AshtaCheckout] Firestore package fetch failed, using fallbacks.', e);
+    }
+
+    // Fallbacks if Firestore fails or is empty
+    PACKAGES = {
+      complete: {
+        id: 'complete',
+        name: 'The Complete 7 Sisters',
+        destination: 'All 7 Northeast States',
+        duration: '14 Days · 13 Nights',
+        pricePerPerson: 85000,
+        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=80&q=70',
+      },
+      assam_megh: {
+        id: 'assam_megh',
+        name: 'Assam + Meghalaya',
+        destination: 'Assam & Meghalaya',
+        duration: '7 Days · 6 Nights',
+        pricePerPerson: 42000,
+        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=80&q=70',
+      },
+      arunachal: {
+        id: 'arunachal',
+        name: 'Arunachal Monastery Trek',
+        destination: 'Arunachal Pradesh',
+        duration: '9 Days · 8 Nights',
+        pricePerPerson: 55000,
+        image: 'https://images.unsplash.com/photo-1543158181-e6f9f6712055?auto=format&fit=crop&w=80&q=70',
+      }
+    };
+  }
+
+  // Auto-init packages
+  initPackages();
 
   // ── State ─────────────────────────────────────────────────
   let currentPkg   = null;

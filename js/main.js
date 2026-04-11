@@ -1,9 +1,6 @@
-import { ComponentLoader } from './componentLoader.js';
-import { initUI } from './ui.js';
-import { initAnimations } from './animations.js';
-import { initThreeJS } from './three-bg.js';
 import { initPlanner } from './planner.js';
 import { initBooking } from './booking.js';
+import { initGlobe } from './globe.js';
 
 /**
  * Main Application Entrance
@@ -39,7 +36,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Initialize App Logic after components are injected
     initAnimations();
     initUI();
-    initThreeJS();
+    initThreeJS(); 
+    initGlobe(); // New Hero Animation
     initPlanner();
     initBooking();
 });

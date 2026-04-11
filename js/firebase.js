@@ -53,8 +53,8 @@
 
   // ── saveUser ─────────────────────────────────────────────
   /**
-   * Upsert a user document in Firestore when they sign in via Firebase Auth.
-   * @param {Object} fbUser - The Firebase user object
+   * Upsert a user document in Firestore when they sign in.
+   * Ensures the user's name is collected and stored correctly.
    */
   async function saveUser(fbUser) {
     if (!initialized) { init(); if (!initialized) return; }
@@ -63,32 +63,35 @@
       const userRef = db.collection('users').doc(uid);
       const snap = await userRef.get();
 
+      // Priority: Firestore name > Auth displayName > email prefix
+      let storedName = snap.exists ? snap.data().name : null;
+      let name = storedName || fbUser.displayName || fbUser.email.split('@')[0] || 'Traveler';
+
       const data = {
         uid,
-        name:      fbUser.displayName || fbUser.email.split('@')[0] || 'Traveler',
+        name,
         email:     fbUser.email || '',
         photoURL:  fbUser.photoURL || '',
         updatedAt: now(),
       };
 
       if (!snap.exists) {
-        // New user — create full document
         data.createdAt     = now();
         data.totalBookings = 0;
         await userRef.set(data);
-        console.log('[AshtaFirebase] New user created in Firestore:', uid);
+        console.log('[AshtaFirebase] New user created:', uid);
       } else {
-        // Existing user — update mutable fields
         await userRef.update({
-          name:      data.name,
           email:     data.email,
           photoURL:  data.photoURL,
           updatedAt: data.updatedAt,
         });
-        console.log('[AshtaFirebase] User document updated:', uid);
+        console.log('[AshtaFirebase] User synced:', uid);
       }
+      return data;
     } catch (e) {
       console.error('[AshtaFirebase] saveUser error:', e);
+      return null;
     }
   }
 
@@ -170,19 +173,44 @@
   // ── updateUserProfile ────────────────────────────────────
   /**
    * Merge-update a user's profile fields.
-   * @param {string} uid
-   * @param {Object} data - Fields to update (name, phone, travelStyle, preferredStates, etc.)
    */
   async function updateUserProfile(uid, data) {
     if (!initialized) { init(); if (!initialized) return; }
     try {
-      await db.collection('users').doc(uid).update({
+      await db.collection('users').doc(uid).set({
         ...data,
         updatedAt: now(),
-      });
-      console.log('[AshtaFirebase] Profile updated for:', uid);
+      }, { merge: true });
+      
+      // Also update Firebase Auth profile if name changed
+      if (data.name) {
+        const user = firebase.auth().currentUser;
+        if (user && user.uid === uid) {
+          await user.updateProfile({ displayName: data.name });
+        }
+      }
+      console.log('[AshtaFirebase] Profile updated:', uid);
     } catch (e) {
       console.error('[AshtaFirebase] updateUserProfile error:', e);
+    }
+  }
+
+  // ── getPackages ───────────────────────────────────────────
+  /**
+   * Fetch all travel packages from Firestore.
+   */
+  async function getPackages() {
+    if (!initialized) { init(); if (!initialized) return []; }
+    try {
+      const snap = await db.collection('packages').get();
+      const packages = {};
+      snap.forEach(doc => {
+        packages[doc.id] = { id: doc.id, ...doc.data() };
+      });
+      return packages;
+    } catch (e) {
+      console.error('[AshtaFirebase] getPackages error:', e);
+      return {};
     }
   }
 
@@ -216,6 +244,7 @@
     getUserBookings,
     updateUserProfile,
     uploadReceiptBlob,
+    getPackages,
   };
 
   // Auto-init when DOM is ready (Firebase CDN may still be loading)

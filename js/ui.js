@@ -189,3 +189,91 @@ export function initUI() {
         });
     }
 }
+
+/**
+ * Smart Hero Logic - Live Atmosphere
+ */
+export function initSmartHero() {
+    const heroSection = document.querySelector('.hero-section');
+    const typewriterText = document.getElementById('typewriterText');
+    const eventText = document.getElementById('activeEventText');
+
+    // 1. Live IST Clock & Dynamic Greeting
+    const timeEl = document.getElementById('liveTime');
+    if (timeEl) {
+        setInterval(() => {
+            const now = new Date();
+            const ist = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (330 * 60000));
+            timeEl.textContent = ist.toLocaleTimeString('en-IN', {
+                hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }) + ' IST';
+        }, 1000);
+    }
+
+    // 2. Atmosphere Sync (Weather-based)
+    const weatherEl = document.getElementById('liveWeather');
+    if (weatherEl && heroSection) {
+        const climates = [
+            { cond: 'Misty', class: 'atmosphere-misty', event: 'Monsoon Trekking Season' },
+            { cond: 'Sunny', class: 'atmosphere-sunny', event: 'Clear Himalayan Views' },
+            { cond: 'Light Rain', class: 'atmosphere-rainy', event: 'Rainforest Awakening' },
+            { cond: 'Clear', class: 'atmosphere-sunny', event: 'Festival Peak Season' }
+        ];
+        
+        const current = climates[Math.floor(Math.random() * climates.length)];
+        const temp = 18 + Math.floor(Math.random() * 10);
+        
+        weatherEl.textContent = `${temp}°C · ${current.cond}`;
+        heroSection.classList.add(current.class);
+        if (eventText) eventText.textContent = current.event;
+    }
+
+    // 3. Dynamic Traveler Counter
+    const travelersEl = document.getElementById('activeTravelers');
+    if (travelersEl) {
+        let count = 3800 + Math.floor(Math.random() * 500);
+        setInterval(() => {
+            count += Math.floor(Math.random() * 5) - 2;
+            travelersEl.textContent = count.toLocaleString();
+        }, 3000);
+    }
+
+    // 4. Globe Focus Integration
+    const stateChips = document.querySelectorAll('.state-chip');
+    stateChips.forEach(chip => {
+        const state = chip.dataset.state;
+        if (!state) return;
+
+        chip.addEventListener('mouseenter', () => {
+            if (window.focusOnState) window.focusOnState(state);
+        });
+
+        chip.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Optional: Smooth scroll to state section if needed
+            const section = document.getElementById(`state-${state.toLowerCase()}`);
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // 5. Automated Ticker Rotation
+    const highlights = [
+        "Hornbill Festival starting soon in Kohima",
+        "Assam Tea Plucking season has begun",
+        "Perfect visibility at Tawang Monastery today",
+        "Living Root Bridges are accessible in Cherrapunji",
+        "Rhino sightings at peak in Kaziranga"
+    ];
+    let hiIdx = 0;
+    setInterval(() => {
+        if (eventText) {
+            eventText.style.opacity = 0;
+            setTimeout(() => {
+                hiIdx = (hiIdx + 1) % highlights.length;
+                eventText.textContent = highlights[hiIdx];
+                eventText.style.opacity = 1;
+            }, 500);
+        }
+    }, 8000);
+}
+

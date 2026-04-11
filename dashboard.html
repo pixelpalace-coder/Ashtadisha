@@ -281,22 +281,36 @@
         const status = document.getElementById('saveStatus');
         status.textContent = 'Updating...';
         
-        const data = {
-          name: document.getElementById('setName').value.trim(),
-          phone: document.getElementById('setPhone').value.trim(),
-          city: document.getElementById('setCity').value.trim(),
-          photoURL: document.getElementById('setPhoto').value.trim()
-        };
-
-
-      // ── Start ────────────────────────────────────────────
-      initAuth();
+        try {
+          const data = {
+            name: document.getElementById('setName').value.trim(),
+            phone: document.getElementById('setPhone').value.trim(),
+            city: document.getElementById('setCity').value.trim(),
+            photoURL: document.getElementById('setPhoto').value.trim()
+          };
+          await window.AshtaFirebase.updateUserProfile(userUID, data);
+          status.textContent = 'Profile updated successfully!';
+          // Refresh UI
+          document.getElementById('dbUserName').textContent = data.name;
+          document.getElementById('dbWelcome').textContent = `Namaste, ${data.name.split(' ')[0]}`;
+        } catch (err) {
+          status.textContent = 'Error updating profile.';
+          console.error(err);
+        }
+      });
 
       // Handle hash navigation (e.g. dashboard.html#my-trips)
       if (location.hash) {
         const tab = location.hash.replace('#', '');
         setTimeout(() => switchTab(tab), 500);
       }
+
+      // Add Logout Listener
+      document.getElementById('sideSignOut').addEventListener('click', () => {
+        firebase.auth().signOut().then(() => {
+          window.location.href = 'index.html';
+        });
+      });
 
     })();
   </script>

@@ -1,28 +1,103 @@
 <section id="hero" class="hero-section">
-  <!-- Three.js canvas will be inserted here by JS -->
+  <!-- Three.js canvas for the interactive globe -->
   <canvas id="heroCanvas" class="hero-canvas"></canvas>
-  <div class="hero-content" id="heroText">
-    <p class="hero-eyebrow" data-aos="fade-down" data-aos-duration="800">✦ Discover India's Best Kept Secret</p>
-    <h1 class="hero-title" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-      The Land of Seven Sisters
-    </h1>
-    <h2 class="hero-title-hi" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">सात बहनों की भूमि
-    </h2>
-    <div class="hero-typewriter" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
-      <span id="typewriterText"></span><span class="cursor-blink">|</span>
-    </div>
-    <div class="hero-ctas" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-      <a href="#seven-sisters" class="btn btn-primary cta-primary" id="heroCta1">Explore Now →<br><small>अन्वेषण
-          करें</small></a>
-      <a href="#ai-planner" class="btn btn-outline" id="heroCta2">Plan My Journey<br><small>यात्रा की योजना
-          बनाएँ</small></a>
+
+  <!-- Premium Glass Smart Portal -->
+  <div class="hero-glass-card dashboard-mode" data-aos="zoom-in" data-aos-duration="1200">
+    <!-- Pulse Ring for atmosphere -->
+    <div class="card-pulse-ring"></div>
+    
+    <div class="hero-content" id="heroText">
+      <div class="hero-header-meta">
+        <span class="hero-eyebrow">✦ Smart Travel Portal</span>
+        <div class="live-indicator">
+          <span class="ping"></span>
+          Live Atmosphere
+        </div>
+      </div>
+
+      <h1 class="hero-title">The Land of Seven Sisters</h1>
+      <h2 class="hero-title-hi">सात बहनों की भूमि</h2>
+      
+      <!-- Automated Highlight Ticker -->
+      <div class="hero-event-ticker" id="eventTicker">
+        <span class="ticker-label">Happening Now:</span>
+        <span class="ticker-text" id="activeEventText">Analyzing regional festivals...</span>
+      </div>
+
+      <div class="hero-typewriter">
+        <span id="typewriterText"></span><span class="cursor-blink">|</span>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="#seven-sisters" class="btn btn-primary cta-primary" id="heroCta1">
+          Explore Portal →<br><small>अन्वेषण करें</small>
+        </a>
+        <a href="#ai-planner" class="btn btn-glass" id="heroCta2">
+          AI Travel Planner<br><small>यात्रा की योजना बनाएँ</small>
+        </a>
+      </div>
+
+      <!-- Quick Explore Chips with Globe Integration -->
+      <div class="quick-explore-chips">
+        <span class="chip-label">Focus Globe:</span>
+        <button class="state-chip" data-state="Assam">Assam</button>
+        <button class="state-chip" data-state="Meghalaya">Meghalaya</button>
+        <button class="state-chip" data-state="Nagaland">Nagaland</button>
+        <button class="state-chip" data-state="Arunachal">Arunachal</button>
+        <button class="state-chip" data-state="Manipur">Manipur</button>
+      </div>
     </div>
   </div>
-  <!-- Scroll Chevron -->
-  <div class="scroll-chevron" aria-label="Scroll down">
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2">
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
+
+  <!-- Smart Status Bar (Dynamic Data) -->
+  <div class="hero-status-bar">
+    <div class="status-group">
+      <div class="status-item">
+        <span class="status-icon">🕒</span>
+        <div class="status-info">
+          <span class="status-label">Local Time</span>
+          <span class="status-value" id="liveTime">00:00:00 IST</span>
+        </div>
+      </div>
+      <div class="status-divider"></div>
+      <div class="status-item" id="weatherWidget">
+        <span class="status-icon">🌤️</span>
+        <div class="status-info">
+          <span class="status-label">Avg. Weather</span>
+          <span class="status-value" id="liveWeather">--°C · Loading</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="status-group">
+      <div class="status-divider hide-mobile"></div>
+      <div class="status-item">
+        <span class="status-icon">👥</span>
+        <div class="status-info">
+          <span class="status-label">Explorers Online</span>
+          <span class="status-value" id="activeTravelers">0</span>
+        </div>
+      </div>
+      <div class="status-divider"></div>
+      <div class="status-item status-connectivity">
+        <div class="connectivity-viz">
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </div>
+        <div class="status-info">
+          <span class="status-label">Network Connectivity</span>
+          <span class="status-value">Stable</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="scroll-cue">
+    <div class="mouse">
+      <div class="wheel"></div>
+    </div>
+    <span>Enter Experience</span>
   </div>
 </section>
+

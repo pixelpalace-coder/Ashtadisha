@@ -170,9 +170,12 @@
       } else {
         // SIGNUP
         const cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-        // Update profile with Name
+        // Update profile with Name (Auth)
         await cred.user.updateProfile({ displayName: name });
-        // Force refresh state
+        // Force sync to Firestore with the name
+        if (window.AshtaFirebase?.saveUser) {
+           await window.AshtaFirebase.saveUser(cred.user, name);
+        }
         onSignedIn(cred.user);
       }
     } catch (err) {

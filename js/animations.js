@@ -55,14 +55,13 @@ export function initAnimations() {
     // 5. Hero Typewriter
     const typeSpan = document.getElementById('typewriterText');
     const typeStrings = [
-        'Explore the Last Frontier of India.',
+        'Where Mist Meets Mountain.',
         'जहाँ कोहरा पहाड़ से मिलता है।',
         '220+ Tribes. 8 States. Infinite Stories.',
-        'Luxury Meets Ancient Tradition.',
+        '220+ जनजातियाँ। 8 राज्य। अनंत कहानियाँ।',
         'Home of the Hornbill Festival.',
-        'सात बहनों का जादुई प्रवेश द्वार।',
-        'Uncover the Hidden Gems of the North East.',
-        'Your Journey into the Extraordinary Begins Here.'
+        'हॉर्नबिल उत्सव की भूमि।',
+        'The Land the World Forgot.',
     ];
     if (typeSpan) {
         let si = 0, ci = 0, deleting = false, typePause = false;

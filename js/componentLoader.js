@@ -28,17 +28,30 @@ export class ComponentLoader {
   }
 
   /**
-   * Loads all registered components sequentially.
+   * Loads all registered components in parallel for maximum speed.
    */
   async loadAll() {
-    console.log('Starting component load...');
+    console.log('Starting parallel component load...');
     
-    for (const name of this.components) {
-      try {
-        const response = await fetch(`components/${name}.html`);
-        if (!response.ok) throw new Error(`Failed to load ${name}`);
-        
-        const html = await response.text();
+    // Create fetch promises for all components simultaneously
+    const fetchPromises = this.components.map(name => 
+      fetch(`components/${name}.html`)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status} for ${name}`);
+          return res.text();
+        })
+        .catch(err => {
+          console.error(`Error fetching component [${name}]:`, err);
+          return null; // Return null so we can filter failed ones later
+        })
+    );
+
+    // Wait for all fetches to finish
+    const results = await Promise.all(fetchPromises);
+
+    // Inject them into the DOM IN ORDER
+    results.forEach((html, index) => {
+      if (html) {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         
@@ -46,12 +59,10 @@ export class ComponentLoader {
         while (tempDiv.firstChild) {
           this.container.appendChild(tempDiv.firstChild);
         }
-      } catch (error) {
-        console.error(`Error loading component [${name}]:`, error);
       }
-    }
+    });
 
-    console.log('All components loaded.');
+    console.log('All components synchronized and injected.');
     // Dispatch event to notify that DOM is ready for animations/logic
     document.dispatchEvent(new CustomEvent('componentsLoaded'));
   }

@@ -2,6 +2,7 @@
    ASHTADISHA — Complete CSS
    =================================================== */
 :root {
+    /* ── Color Palette ── */
     --color-bg: #F7F3EE;
     --color-bg-alt: #EDE8E0;
     --color-surface: #FFFFFF;
@@ -12,13 +13,32 @@
     --color-muted: #6B5F52;
     --color-border: rgba(26, 60, 46, 0.15);
     --color-overlay: rgba(26, 60, 46, 0.65);
+    
+    /* ── Typography ── */
     --font-display: 'Cormorant Garamond', serif;
     --font-body: 'DM Sans', sans-serif;
     --font-accent: 'Playfair Display', serif;
     --font-hindi: 'Hind', sans-serif;
+    
+    /* ── Spacing & Layout ── */
     --spacing-unit: 8px;
-    --transition-standard: 0.3s ease;
+    --transition-standard: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --max-w: 1200px;
+    --radius-sm: 4px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 40px;
+
+    /* ── Z-Index Map (The Logic) ── */
+    --z-base: 1;
+    --z-canvas: -1;
+    --z-dropdown: 100;
+    --z-nav: 1000;
+    --z-overlay: 9998;
+    --z-cursor: 9999;
+    --z-modal: 10000;
+    --z-loader: 10001;
+    --z-top: 10002;
 }
 
 html.dark {
@@ -31,7 +51,7 @@ html.dark {
     --color-text: #E0E8E0;
     --color-muted: #8FA095;
     --color-border: rgba(76, 175, 125, 0.2);
-    --color-overlay: rgba(0, 0, 0, 0.8);
+    --color-overlay: rgba(0, 0, 0, 0.85);
 }
 
 *,

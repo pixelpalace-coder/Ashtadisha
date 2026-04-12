@@ -84,6 +84,18 @@
       </h1>
       <p class="loader-hindi">सात बहनों का प्रवेश द्वार</p>
     </div>
+    <script>
+      // Immediate Bulletproof Fail-safe
+      setTimeout(function() {
+        var l = document.getElementById('loader');
+        if (l && l.style.display !== 'none') {
+          l.style.transition = 'opacity 0.6s ease, visibility 0.6s';
+          l.style.opacity = '0';
+          l.style.visibility = 'hidden';
+          setTimeout(function() { l.style.display = 'none'; document.body.style.overflow = ''; }, 600);
+        }
+      }, 4500);
+    </script>
   </div>
 
   <!-- Theme Toggle -->
@@ -464,6 +476,8 @@
   <script src="js/auth.js" defer></script>
   <script src="js/payment.js" defer></script>
   <script src="js/booking-checkout.js" defer></script>
+
+</body>
 
 </body>
 

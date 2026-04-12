@@ -188,4 +188,13 @@ export function initUI() {
             setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 3000);
         });
     }
+
+    // 7. Hero Live Clock (Awesome UI)
+    const heroClock = document.getElementById('heroClock');
+    if (heroClock) {
+        setInterval(() => {
+            const now = new Date();
+            heroClock.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }, 1000);
+    }
 }

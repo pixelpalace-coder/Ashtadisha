@@ -37,21 +37,21 @@ export function initBooking() {
     });
 
     function populateReview() {
-        const pkgLabel = { complete:'The Complete 7 Sisters (₹85,000)', assam_megh:'Assam + Meghalaya (₹42,000)', arunachal:'Arunachal Monastery Trek (₹55,000)', hornbill:'Hornbill Festival Special (₹38,000)', wildlife:'Wildlife & Safari Circuit (₹62,000)', custom:'Custom Journey (On request)' };
+        const pkgLabel = { complete: 'The Complete 7 Sisters (₹85,000)', assam_megh: 'Assam + Meghalaya (₹42,000)', arunachal: 'Arunachal Monastery Trek (₹55,000)', hornbill: 'Hornbill Festival Special (₹38,000)', wildlife: 'Wildlife & Safari Circuit (₹62,000)', custom: 'Custom Journey (On request)' };
         const selectedPkg = document.querySelector('input[name="package"]:checked');
         const adults = parseInt(document.getElementById('adultsCount')?.value || 2);
         const children = parseInt(document.getElementById('childrenCount')?.value || 0);
         const price = selectedPkg ? parseInt(selectedPkg.dataset.price || 0) : 0;
         const total = price * adults;
-        const formatted = total ? new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(total) : '—';
+        const formatted = total ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(total) : '—';
 
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         set('rv-package', selectedPkg ? pkgLabel[selectedPkg.value] || selectedPkg.value : '—');
         set('rv-date', document.getElementById('departDate')?.value || '—');
-        set('rv-travelers', `${adults} Adult${adults>1?'s':''} + ${children} Child${children===1?'':'ren'}`);
+        set('rv-travelers', `${adults} Adult${adults > 1 ? 's' : ''} + ${children} Child${children === 1 ? '' : 'ren'}`);
         set('rv-accom', document.getElementById('accommodation')?.value || '—');
         set('rv-name', document.getElementById('fullName')?.value || '—');
-        set('rv-total', formatted + (total ? ` (10% advance: ${new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(total*0.1)})` : ''));
+        set('rv-total', formatted + (total ? ` (10% advance: ${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(total * 0.1)})` : ''));
     }
 
     const confirmBtn = document.getElementById('confirmBookingBtn');

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
@@ -15,6 +15,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    // Prevent Flash of Unstyled Content (FOUC)
+    const savedTheme = localStorage.getItem('ashtadisha_theme') || 'light';
+    document.documentElement.classList.add(savedTheme);
+  </script>
 </head>
 
 <body class="dashboard-page">
@@ -40,24 +45,24 @@
     <nav class="db-nav">
       <button class="db-nav-btn active" data-tab="overview">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Overview
+        <span class="nav-text">Overview</span>
       </button>
       <button class="db-nav-btn" data-tab="trips">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        My Bookings
+        <span class="nav-text">My Bookings</span>
       </button>
       <button class="db-nav-btn" data-tab="explore">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-        Explore More
+        <span class="nav-text">Explore More</span>
       </button>
       <button class="db-nav-btn" data-tab="settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        Account Settings
+        <span class="nav-text">Account Settings</span>
       </button>
       <div class="db-nav-spacer"></div>
       <button class="db-nav-btn signout" id="sideSignOut">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-        Sign Out
+        <span class="nav-text">Sign Out</span>
       </button>
     </nav>
   </aside>
@@ -129,23 +134,23 @@
       <div class="db-section-header">
         <h2>Account Settings</h2>
       </div>
-      <form class="db-form card" id="settingsForm">
+      <form class="db-form db-card" id="settingsForm">
         <div class="form-grid">
           <div class="form-group">
             <label>Display Name</label>
-            <input type="text" id="setName" placeholder="Full Name">
+            <input type="text" id="setName" class="db-input" placeholder="Full Name">
           </div>
           <div class="form-group">
             <label>Phone Number</label>
-            <input type="tel" id="setPhone" placeholder="+91 90000 00000">
+            <input type="tel" id="setPhone" class="db-input" placeholder="+91 90000 00000">
           </div>
           <div class="form-group">
             <label>Primary City</label>
-            <input type="text" id="setCity" placeholder="City">
+            <input type="text" id="setCity" class="db-input" placeholder="City">
           </div>
           <div class="form-group">
             <label>Profile Image URL</label>
-            <input type="url" id="setPhoto" placeholder="https://...">
+            <input type="url" id="setPhoto" class="db-input" placeholder="https://...">
           </div>
         </div>
         <button type="submit" class="btn-primary">Update Profile</button>
@@ -310,6 +315,22 @@
         firebase.auth().signOut().then(() => {
           window.location.href = 'index.html';
         });
+      });
+
+      // 5. Theme Toggle Logic
+      const themeBtn = document.getElementById('themeToggle');
+      const htmlEl = document.documentElement;
+      
+      // Init theme button icon based on current state
+      const isDark = htmlEl.classList.contains('dark');
+      themeBtn.textContent = isDark ? '☾' : '☀';
+
+      themeBtn.addEventListener('click', () => {
+        const currentlyDark = htmlEl.classList.contains('dark');
+        htmlEl.classList.toggle('dark', !currentlyDark);
+        htmlEl.classList.toggle('light', currentlyDark);
+        localStorage.setItem('ashtadisha_theme', currentlyDark ? 'light' : 'dark');
+        themeBtn.textContent = currentlyDark ? '☀' : '☾';
       });
 
     })();

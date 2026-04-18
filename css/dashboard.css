@@ -99,6 +99,9 @@ html.dark .dashboard-page {
 .db-list-item:hover { border-color: var(--color-accent); transform: translateX(5px); }
 .item-info h4 { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 0.25rem; color: var(--color-primary); }
 .item-info p { font-size: 0.8rem; color: var(--color-muted); }
+.db-booking-meta { font-size: 0.8rem; color: var(--color-muted); margin-top: 0.2rem; }
+.db-booking-ref { font-size: 0.72rem; color: var(--color-muted); opacity: 0.9; margin-top: 0.15rem; }
+.db-source-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; background: rgba(76, 175, 125, 0.12); color: var(--color-primary); }
 .item-status { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-xl); letter-spacing: 0.5px; }
 .item-price { font-weight: bold; color: var(--color-text); }
 .status-confirmed { background: rgba(76, 175, 125, 0.1); color: #4caf7d; }

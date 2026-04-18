@@ -2,154 +2,299 @@
   <div class="container">
     <h2 class="section-title" data-aos="fade-up">Curated Journeys</h2>
     <p class="section-title-hi" data-aos="fade-up" data-aos-delay="100">प्रीमियम यात्रा पैकेज</p>
-    <p class="section-desc">Premium tours with certified local experts. / प्रमाणित स्थानीय विशेषज्ञों के साथ।</p>
-    <div class="booking-wrapper">
+    <p class="section-desc" data-aos="fade-up" data-aos-delay="150">
+      Handcrafted tours with certified local experts. All prices include 3-star stays, meals & transport. / प्रमाणित स्थानीय विशेषज्ञों के साथ, आवास, भोजन और परिवहन सहित।
+    </p>
+
+    <div class="booking-wrapper" data-aos="fade-up" data-aos-delay="200">
+
       <!-- Step Indicators -->
       <div class="booking-steps" id="bookingSteps">
-        <div class="b-step active" data-step="1"><span class="step-num">1</span><span
-            class="step-label">Package<br><small>पैकेज</small></span></div>
+        <div class="b-step active" data-step="1">
+          <span class="step-num">1</span>
+          <span class="step-label">Package<br><small>पैकेज</small></span>
+        </div>
         <div class="step-connector"></div>
-        <div class="b-step" data-step="2"><span class="step-num">2</span><span class="step-label">Travel
-            Details<br><small>यात्रा विवरण</small></span></div>
+        <div class="b-step" data-step="2">
+          <span class="step-num">2</span>
+          <span class="step-label">Travel Details<br><small>यात्रा विवरण</small></span>
+        </div>
         <div class="step-connector"></div>
-        <div class="b-step" data-step="3"><span class="step-num">3</span><span class="step-label">Your
-            Info<br><small>आपकी जानकारी</small></span></div>
+        <div class="b-step" data-step="3">
+          <span class="step-num">3</span>
+          <span class="step-label">Your Info<br><small>आपकी जानकारी</small></span>
+        </div>
         <div class="step-connector"></div>
-        <div class="b-step" data-step="4"><span class="step-num">4</span><span
-            class="step-label">Review<br><small>समीक्षा</small></span></div>
+        <div class="b-step" data-step="4">
+          <span class="step-num">4</span>
+          <span class="step-label">Review & Pay<br><small>समीक्षा</small></span>
+        </div>
       </div>
 
-      <!-- Step 1: Packages -->
+      <!-- ───── Step 1: Packages ───── -->
       <div class="booking-step-panel active" id="bStep1">
         <h3 class="step-heading">Choose Your Package / <span class="hi">अपना पैकेज चुनें</span></h3>
+
         <div class="pkg-grid">
-          <label class="pkg-card"><input type="radio" name="package" value="complete" data-price="85000" checked>
-            <div class="pkg-inner"><span class="pkg-badge popular">Most Popular</span><img
-                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=400&q=70"
-                alt="The Complete 7 Sisters" loading="lazy" decoding="async" width="800" height="500">
+
+          <!-- 1. The Complete 7 Sisters -->
+          <label class="pkg-card">
+            <input type="radio" name="package" value="complete-7-sisters" data-price="89000" checked>
+            <div class="pkg-inner">
+              <span class="pkg-badge popular">⭐ Most Popular</span>
+              <div class="pkg-img-wrap">
+                <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80" alt="Tawang Monastery, Arunachal Pradesh" loading="lazy">
+                <div class="pkg-img-overlay">
+                  <span class="pkg-state-tags">Assam · Meghalaya · Arunachal · Nagaland · Manipur · Mizoram · Tripura</span>
+                </div>
+              </div>
               <div class="pkg-body">
                 <h4>The Complete 7 Sisters</h4>
                 <p class="pkg-hi">सात बहनों का सम्पूर्ण भ्रमण</p>
                 <ul class="pkg-features">
-                  <li>✓ 14 Days · 13 Nights</li>
-                  <li>✓ All 7 States</li>
-                  <li>✓ 4-star stays</li>
-                  <li>✓ Expert local guide</li>
-                </ul><span class="pkg-price">From <strong>₹85,000</strong>/person</span>
+                  <li><span class="feat-icon">🗓</span> 14 Days · 13 Nights</li>
+                  <li><span class="feat-icon">🏨</span> All 7 States · 3-star stays</li>
+                  <li><span class="feat-icon">🚙</span> 4×4 SUV throughout + driver</li>
+                  <li><span class="feat-icon">🧑‍🦯</span> Certified local guide per state</li>
+                  <li><span class="feat-icon">📋</span> ILP permits included</li>
+                </ul>
+                <div class="pkg-price-row">
+                  <div>
+                    <span class="pkg-from">From</span>
+                    <span class="pkg-price">₹89,000</span>
+                    <span class="pkg-per">/person</span>
+                  </div>
+                  <span class="pkg-gst">+ 5% GST</span>
+                </div>
               </div>
             </div>
           </label>
-          <label class="pkg-card"><input type="radio" name="package" value="assam_megh" data-price="42000">
-            <div class="pkg-inner"><img
-                src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=400&q=70"
-                alt="Assam Meghalaya" loading="lazy" decoding="async" width="800" height="500">
+
+          <!-- 2. Assam + Meghalaya -->
+          <label class="pkg-card">
+            <input type="radio" name="package" value="assam-meghalaya" data-price="42500">
+            <div class="pkg-inner">
+              <div class="pkg-img-wrap">
+                <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80" alt="Living Root Bridge, Meghalaya" loading="lazy">
+                <div class="pkg-img-overlay">
+                  <span class="pkg-state-tags">Assam · Meghalaya</span>
+                </div>
+              </div>
               <div class="pkg-body">
-                <h4>Assam + Meghalaya</h4>
+                <h4>Assam + Meghalaya Escape</h4>
                 <p class="pkg-hi">असम + मेघालय की खोज</p>
                 <ul class="pkg-features">
-                  <li>✓ 7 Days · 6 Nights</li>
-                  <li>✓ Tea gardens + Root Bridges</li>
-                  <li>✓ 3-star stays</li>
-                  <li>✓ Guided tours</li>
-                </ul><span class="pkg-price">From <strong>₹42,000</strong>/person</span>
+                  <li><span class="feat-icon">🗓</span> 7 Days · 6 Nights</li>
+                  <li><span class="feat-icon">🌿</span> Kaziranga Safari + Living Root Bridge</li>
+                  <li><span class="feat-icon">🫖</span> Brahmaputra river cruise + Tea garden walk</li>
+                  <li><span class="feat-icon">🏨</span> Iora, Kaziranga + Heritage stays, Shillong</li>
+                </ul>
+                <div class="pkg-price-row">
+                  <div>
+                    <span class="pkg-from">From</span>
+                    <span class="pkg-price">₹42,500</span>
+                    <span class="pkg-per">/person</span>
+                  </div>
+                  <span class="pkg-gst">+ 5% GST</span>
+                </div>
               </div>
             </div>
           </label>
-          <label class="pkg-card"><input type="radio" name="package" value="arunachal" data-price="55000">
-            <div class="pkg-inner"><img
-                src="https://images.unsplash.com/photo-1543158181-e6f9f6712055?auto=format&fit=crop&w=400&q=70"
-                alt="Arunachal Monastery Trek" loading="lazy" decoding="async" width="800" height="500">
+
+          <!-- 3. Arunachal Deep Dive -->
+          <label class="pkg-card">
+            <input type="radio" name="package" value="arunachal-deep-dive" data-price="58500">
+            <div class="pkg-inner">
+              <div class="pkg-img-wrap">
+                <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80" alt="Ziro Valley, Arunachal Pradesh" loading="lazy">
+                <div class="pkg-img-overlay">
+                  <span class="pkg-state-tags">Arunachal Pradesh</span>
+                </div>
+              </div>
               <div class="pkg-body">
-                <h4>Arunachal Monastery Trek</h4>
+                <h4>Arunachal Deep Dive</h4>
                 <p class="pkg-hi">अरुणाचल मठ ट्रेक</p>
                 <ul class="pkg-features">
-                  <li>✓ 9 Days · 8 Nights</li>
-                  <li>✓ Tawang + Ziro Valley</li>
-                  <li>✓ Permit assistance</li>
-                  <li>✓ Mountain guides</li>
-                </ul><span class="pkg-price">From <strong>₹55,000</strong>/person</span>
+                  <li><span class="feat-icon">🗓</span> 9 Days · 8 Nights</li>
+                  <li><span class="feat-icon">🏔</span> Tawang Monastery (3140m) + Ziro Valley</li>
+                  <li><span class="feat-icon">📋</span> Inner Line Permit + RAP assistance</li>
+                  <li><span class="feat-icon">🧗</span> Mechuka trek + Sela Pass (4170m)</li>
+                </ul>
+                <div class="pkg-price-row">
+                  <div>
+                    <span class="pkg-from">From</span>
+                    <span class="pkg-price">₹58,500</span>
+                    <span class="pkg-per">/person</span>
+                  </div>
+                  <span class="pkg-gst">+ 5% GST</span>
+                </div>
               </div>
             </div>
           </label>
-          <label class="pkg-card"><input type="radio" name="package" value="hornbill" data-price="38000">
-            <div class="pkg-inner"><span class="pkg-badge fest">Festival Special</span><img
-                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=70"
-                alt="Hornbill Festival" loading="lazy" decoding="async" width="800" height="500">
+
+          <!-- 4. Hornbill Festival -->
+          <label class="pkg-card">
+            <input type="radio" name="package" value="hornbill-festival" data-price="36000">
+            <div class="pkg-inner">
+              <span class="pkg-badge fest">🎉 Festival Special</span>
+              <div class="pkg-img-wrap">
+                <img src="https://images.unsplash.com/photo-1604928141064-207cea6f571f?auto=format&fit=crop&w=800&q=80" alt="Hornbill Festival, Nagaland" loading="lazy">
+                <div class="pkg-img-overlay">
+                  <span class="pkg-state-tags">Nagaland</span>
+                </div>
+              </div>
               <div class="pkg-body">
                 <h4>Hornbill Festival Special</h4>
-                <p class="pkg-hi">हॉर्नबिल उत्सव विशेष</p>
+                <p class="pkg-hi">हॉर्नबिल उत्सव — नागालैंड</p>
                 <ul class="pkg-features">
-                  <li>✓ 5 Days · 4 Nights</li>
-                  <li>✓ Dec 1–10 only</li>
-                  <li>✓ All 16 Naga tribes</li>
-                  <li>✓ Cultural immersion</li>
-                </ul><span class="pkg-price">From <strong>₹38,000</strong>/person</span>
+                  <li><span class="feat-icon">🗓</span> 5 Days · 4 Nights · Dec 1–10 only</li>
+                  <li><span class="feat-icon">🥁</span> All 16 Naga tribes · Kisama Heritage Village</li>
+                  <li><span class="feat-icon">🍖</span> Authentic Naga cuisine included</li>
+                  <li><span class="feat-icon">🎟</span> Festival pass + cultural immersion</li>
+                </ul>
+                <div class="pkg-price-row">
+                  <div>
+                    <span class="pkg-from">From</span>
+                    <span class="pkg-price">₹36,000</span>
+                    <span class="pkg-per">/person</span>
+                  </div>
+                  <span class="pkg-gst">+ 5% GST</span>
+                </div>
               </div>
             </div>
           </label>
-          <label class="pkg-card"><input type="radio" name="package" value="wildlife" data-price="62000">
-            <div class="pkg-inner"><img
-                src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=70"
-                alt="Wildlife Safari" loading="lazy" decoding="async" width="800" height="500">
+
+          <!-- 5. Wildlife Circuit -->
+          <label class="pkg-card">
+            <input type="radio" name="package" value="wildlife-circuit" data-price="52000">
+            <div class="pkg-inner">
+              <div class="pkg-img-wrap">
+                <img src="https://images.unsplash.com/photo-1564760055775-d63b17a55c44?auto=format&fit=crop&w=800&q=80" alt="One-horned Rhino, Kaziranga" loading="lazy">
+                <div class="pkg-img-overlay">
+                  <span class="pkg-state-tags">Assam · Arunachal · Manipur</span>
+                </div>
+              </div>
               <div class="pkg-body">
-                <h4>Wildlife &amp; Safari Circuit</h4>
+                <h4>Wildlife & Safari Circuit</h4>
                 <p class="pkg-hi">वन्यजीव सफारी सर्किट</p>
                 <ul class="pkg-features">
-                  <li>✓ 10 Days · 9 Nights</li>
-                  <li>✓ Kaziranga + Manas + Namdapha</li>
-                  <li>✓ One-horn rhino!</li>
-                  <li>✓ Naturalist guide</li>
-                </ul><span class="pkg-price">From <strong>₹62,000</strong>/person</span>
+                  <li><span class="feat-icon">🗓</span> 8 Days · 7 Nights</li>
+                  <li><span class="feat-icon">🦏</span> Kaziranga (UNESCO) + Manas NP jeep safaris</li>
+                  <li><span class="feat-icon">🐅</span> Namdapha Tiger Reserve (Arunachal)</li>
+                  <li><span class="feat-icon">🌿</span> Certified naturalist guide throughout</li>
+                </ul>
+                <div class="pkg-price-row">
+                  <div>
+                    <span class="pkg-from">From</span>
+                    <span class="pkg-price">₹52,000</span>
+                    <span class="pkg-per">/person</span>
+                  </div>
+                  <span class="pkg-gst">+ 5% GST</span>
+                </div>
               </div>
             </div>
           </label>
-          <label class="pkg-card"><input type="radio" name="package" value="custom" data-price="0">
-            <div class="pkg-inner custom-pkg">
+
+          <!-- 6. Sikkim + Darjeeling -->
+          <label class="pkg-card">
+            <input type="radio" name="package" value="sikkim-darjeeling" data-price="38000">
+            <div class="pkg-inner">
+              <div class="pkg-img-wrap">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80" alt="Kangchenjunga, Sikkim" loading="lazy">
+                <div class="pkg-img-overlay">
+                  <span class="pkg-state-tags">Sikkim · West Bengal</span>
+                </div>
+              </div>
               <div class="pkg-body">
-                <h4>✦ Custom Journey</h4>
-                <p class="pkg-hi">आपकी अपनी यात्रा</p>
-                <p>Use our AI Planner above to craft a bespoke route, then book it here.</p>
-                <p class="pkg-hi">ऊपर AI प्लानर का उपयोग करें।</p><span class="pkg-price">Pricing on request</span>
+                <h4>Sikkim & Darjeeling Retreat</h4>
+                <p class="pkg-hi">सिक्किम और दार्जिलिंग वापसी</p>
+                <ul class="pkg-features">
+                  <li><span class="feat-icon">🗓</span> 6 Days · 5 Nights</li>
+                  <li><span class="feat-icon">🏔</span> Kangchenjunga + Tsomgo Lake</li>
+                  <li><span class="feat-icon">🚂</span> Darjeeling Toy Train (heritage ride)</li>
+                  <li><span class="feat-icon">🍵</span> Premium Darjeeling tea estate visit</li>
+                </ul>
+                <div class="pkg-price-row">
+                  <div>
+                    <span class="pkg-from">From</span>
+                    <span class="pkg-price">₹38,000</span>
+                    <span class="pkg-per">/person</span>
+                  </div>
+                  <span class="pkg-gst">+ 5% GST</span>
+                </div>
               </div>
             </div>
           </label>
+
+          <!-- 7. Custom Journey -->
+          <label class="pkg-card pkg-card-custom">
+            <input type="radio" name="package" value="custom" data-price="0">
+            <div class="pkg-inner custom-pkg">
+              <div class="custom-pkg-content">
+                <div class="custom-icon">✦</div>
+                <h4>Custom Journey</h4>
+                <p class="pkg-hi">आपकी अपनी यात्रा</p>
+                <p>Use the AI Planner above to craft your unique route, then book it here at tailored pricing.</p>
+                <span class="pkg-price-custom">Pricing on Request</span>
+              </div>
+            </div>
+          </label>
+
+        </div><!-- /.pkg-grid -->
+
+        <!-- Price breakdown note -->
+        <div class="pkg-includes-note">
+          <strong>All packages include:</strong> Accommodation · All meals (3/day) · Local transport (Sumo/SUV) · Guide fees · Basic travel insurance. Flights to Guwahati/Bagdogra not included.
         </div>
-        <div class="step-nav"><button class="btn btn-primary step-next" data-next="2">Next: Travel Details
-            →<br><small>अगला: यात्रा विवरण</small></button></div>
+
+        <div class="step-nav">
+          <button class="btn btn-primary step-next" data-next="2">Next: Travel Details →<br><small>अगला: यात्रा विवरण</small></button>
+        </div>
       </div>
 
-      <!-- Step 2: Travel Details -->
+      <!-- ───── Step 2: Travel Details ───── -->
       <div class="booking-step-panel" id="bStep2">
         <h3 class="step-heading">Travel Details / <span class="hi">यात्रा विवरण</span></h3>
         <div class="form-grid-2">
-          <div class="input-group"><label>Departure Date / <span class="hi">यात्रा तिथि</span></label><input
-              type="date" id="departDate" required></div>
-          <div class="input-group"><label>Return Date / <span class="hi">वापसी तिथि</span></label><input type="date"
-              id="returnDate"></div>
-          <div class="input-group"><label>Adults (18+) / <span class="hi">वयस्क</span></label><input type="number"
-              id="adultsCount" min="1" max="20" value="2"></div>
-          <div class="input-group"><label>Children (0–17) / <span class="hi">बच्चे</span></label><input
-              type="number" id="childrenCount" min="0" max="10" value="0"></div>
-        </div>
-        <div class="form-grid-2">
-          <div class="input-group"><label>Accommodation / <span class="hi">आवास</span></label><select
-              id="accommodation">
+          <div class="input-group">
+            <label>Departure Date / <span class="hi">यात्रा तिथि</span></label>
+            <input type="date" id="departDate" required>
+          </div>
+          <div class="input-group">
+            <label>Return Date / <span class="hi">वापसी तिथि</span></label>
+            <input type="date" id="returnDate">
+          </div>
+          <div class="input-group">
+            <label>Adults (18+) / <span class="hi">वयस्क</span></label>
+            <input type="number" id="adultsCount" min="1" max="20" value="2">
+          </div>
+          <div class="input-group">
+            <label>Children (2–17) / <span class="hi">बच्चे</span></label>
+            <input type="number" id="childrenCount" min="0" max="10" value="0">
+          </div>
+          <div class="input-group">
+            <label>Accommodation / <span class="hi">आवास</span></label>
+            <select id="accommodation">
+              <option value="homestay">Homestays + Heritage Properties (recommended)</option>
               <option value="3star">3-Star Hotels</option>
-              <option value="4star">4-Star Hotels</option>
-              <option value="5star">5-Star Luxury</option>
-              <option value="homestay">Homestays (recommended)</option>
-              <option value="camp">Tent Camps &amp; Eco-lodges</option>
-            </select></div>
-          <div class="input-group"><label>Transport / <span class="hi">परिवहन</span></label><select id="transport">
-              <option value="suv">4x4 SUV (recommended)</option>
-              <option value="car">Sedan Car</option>
-              <option value="pvt_flight">Private Flights</option>
-              <option value="mixed">Mixed (Car + Train)</option>
-            </select></div>
+              <option value="4star">4-Star Hotels (+₹8,000/person)</option>
+              <option value="5star">5-Star Luxury (+₹22,000/person)</option>
+              <option value="camp">Eco-Lodges / Glamping Camps</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Transport / <span class="hi">परिवहन</span></label>
+            <select id="transport">
+              <option value="suv">4×4 Sumo/Bolero — recommended for NE roads</option>
+              <option value="sedan">Sedan / Innova Crysta</option>
+              <option value="mixed">Mixed (Car + local bus + train)</option>
+              <option value="pvt_flight">Private Flights (+₹30,000/person)</option>
+            </select>
+          </div>
         </div>
-        <div class="input-group full-width"><label>Special Requests / <span class="hi">विशेष
-              अनुरोध</span></label><textarea id="specialReq" rows="3"
-            placeholder="Dietary needs, accessibility, medical, or any special preferences... / खान-पान, पहुँच, स्वास्थ्य या कोई विशेष प्राथमिकता..."></textarea>
+        <div class="input-group full-width">
+          <label>Special Requests / <span class="hi">विशेष अनुरोध</span></label>
+          <textarea id="specialReq" rows="3" placeholder="Dietary needs, accessibility requirements, medical info, anniversary/honeymoon, photographer request... / खान-पान, पहुँच, स्वास्थ्य या विशेष प्राथमिकता..."></textarea>
         </div>
         <div class="step-nav">
           <button class="btn btn-outline step-prev" data-prev="1">← Back / वापस</button>
@@ -157,39 +302,51 @@
         </div>
       </div>
 
-      <!-- Step 3: Personal Info -->
+      <!-- ───── Step 3: Personal Info ───── -->
       <div class="booking-step-panel" id="bStep3">
         <h3 class="step-heading">Your Information / <span class="hi">आपकी जानकारी</span></h3>
         <div class="form-grid-2">
-          <div class="input-group"><label>Full Name / <span class="hi">पूरा नाम</span></label><input type="text"
-              id="fullName" placeholder="As per passport" required></div>
-          <div class="input-group"><label>Email / <span class="hi">ईमेल</span></label><input type="email" id="email"
-              placeholder="your@email.com" required></div>
-          <div class="input-group"><label>Phone / <span class="hi">फ़ोन</span></label><input type="tel" id="phone"
-              placeholder="+91 98765 43210" required></div>
-          <div class="input-group"><label>Nationality / <span class="hi">राष्ट्रीयता</span></label><input
-              type="text" id="nationality" placeholder="Indian" value="Indian"></div>
-          <div class="input-group"><label>City / <span class="hi">शहर</span></label><input type="text" id="city"
-              placeholder="Mumbai, Delhi..."></div>
-          <div class="input-group"><label>How did you hear? / <span class="hi">कैसे पता चला?</span></label><select
-              id="referral">
-              <option>Social Media</option>
-              <option>Friend / Family</option>
-              <option>Search Engine</option>
-              <option>Travel Blog</option>
-              <option>AI Planner</option>
-            </select></div>
+          <div class="input-group">
+            <label>Full Name / <span class="hi">पूरा नाम</span></label>
+            <input type="text" id="fullName" placeholder="As per Aadhaar / Passport" required>
+          </div>
+          <div class="input-group">
+            <label>Email / <span class="hi">ईमेल</span></label>
+            <input type="email" id="email" placeholder="your@email.com" required>
+          </div>
+          <div class="input-group">
+            <label>Mobile / <span class="hi">मोबाइल</span></label>
+            <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="input-group">
+            <label>Nationality / <span class="hi">राष्ट्रीयता</span></label>
+            <input type="text" id="nationality" placeholder="Indian" value="Indian">
+          </div>
+          <div class="input-group">
+            <label>Departure City / <span class="hi">गृहनगर</span></label>
+            <input type="text" id="city" placeholder="Delhi, Mumbai, Bangalore...">
+          </div>
+          <div class="input-group">
+            <label>How did you hear? / <span class="hi">कैसे पता चला?</span></label>
+            <select id="referral">
+              <option>Social Media (Instagram / YouTube)</option>
+              <option>Friend / Family Recommendation</option>
+              <option>Google Search</option>
+              <option>Travel Blog / Article</option>
+              <option>Our AI Planner</option>
+              <option>Travel Expo / Event</option>
+            </select>
+          </div>
         </div>
         <div class="step-nav">
           <button class="btn btn-outline step-prev" data-prev="2">← Back / वापस</button>
-          <button class="btn btn-primary step-next" data-next="4">Review Booking →<br><small>बुकिंग की
-              समीक्षा</small></button>
+          <button class="btn btn-primary step-next" data-next="4">Review Booking →<br><small>बुकिंग की समीक्षा</small></button>
         </div>
       </div>
 
-      <!-- Step 4: Review + Pay -->
+      <!-- ───── Step 4: Review + Pay ───── -->
       <div class="booking-step-panel" id="bStep4">
-        <h3 class="step-heading">Review &amp; Confirm / <span class="hi">समीक्षा और पुष्टि</span></h3>
+        <h3 class="step-heading">Review & Confirm / <span class="hi">समीक्षा और पुष्टि</span></h3>
         <div class="review-grid">
           <div class="review-box" id="reviewSummary">
             <div class="review-row"><span>Package</span><strong id="rv-package">—</strong></div>
@@ -197,40 +354,47 @@
             <div class="review-row"><span>Travelers</span><strong id="rv-travelers">—</strong></div>
             <div class="review-row"><span>Accommodation</span><strong id="rv-accom">—</strong></div>
             <div class="review-row"><span>Guest Name</span><strong id="rv-name">—</strong></div>
-            <div class="review-row total-row"><span>Estimated Total</span><strong id="rv-total"
-                class="text-accent">—</strong></div>
+            <div class="review-row"><span>Base Price</span><strong id="rv-base">—</strong></div>
+            <div class="review-row"><span>GST (5%)</span><strong id="rv-gst">—</strong></div>
+            <div class="review-row total-row"><span>Total Payable</span><strong id="rv-total" class="text-accent">—</strong></div>
+            <p class="rv-note">10% advance to confirm booking. Balance paid locally.</p>
           </div>
           <div class="payment-box">
-            <h4>Payment / <span class="hi">भुगतान</span></h4>
+            <h4>Secure Payment / <span class="hi">भुगतान</span></h4>
             <div class="pay-options">
-              <label class="pay-opt"><input type="radio" name="payment" value="upi" checked> UPI (GPay, PhonePe,
-                Paytm)</label>
-              <label class="pay-opt"><input type="radio" name="payment" value="card"> Credit / Debit Card</label>
-              <label class="pay-opt"><input type="radio" name="payment" value="netbanking"> Net Banking</label>
-              <label class="pay-opt"><input type="radio" name="payment" value="emi"> EMI (0% for 6 months)</label>
+              <label class="pay-opt"><input type="radio" name="payment" value="upi" checked>
+                <span class="pay-opt-icon">📱</span> UPI (GPay, PhonePe, Paytm)</label>
+              <label class="pay-opt"><input type="radio" name="payment" value="card">
+                <span class="pay-opt-icon">💳</span> Credit / Debit Card (Visa, Mastercard)</label>
+              <label class="pay-opt"><input type="radio" name="payment" value="netbanking">
+                <span class="pay-opt-icon">🏦</span> Net Banking</label>
+              <label class="pay-opt"><input type="radio" name="payment" value="emi">
+                <span class="pay-opt-icon">📅</span> EMI — 0% interest for 6 months</label>
             </div>
-            <p class="pay-note">💳 Secure 256-bit SSL. 10% advance, rest on arrival. / 10% अग्रिम, शेष आगमन पर।</p>
-            <button type="button" class="btn btn-primary btn-full animate-hover" id="confirmBookingBtn">✦ Confirm
-              &amp; Pay Advance<br><small>पुष्टि करें और अग्रिम भुगतान करें</small></button>
+            <div class="pay-security">
+              <span>🔒 256-bit SSL Encrypted</span>
+              <span>✓ RBI Compliant</span>
+              <span>✓ Razorpay Secured</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-full animate-hover" id="confirmBookingBtn">
+              ✦ Confirm & Pay 10% Advance<br><small>पुष्टि करें और 10% अग्रिम भुगतान करें</small>
+            </button>
           </div>
         </div>
-        <div class="step-nav"><button class="btn btn-outline step-prev" data-prev="3">← Edit Details / संपादित
-            करें</button></div>
+        <div class="step-nav"><button class="btn btn-outline step-prev" data-prev="3">← Edit Details / संपादित करें</button></div>
       </div>
 
-      <!-- Success Screen -->
+      <!-- ───── Success Screen ───── -->
       <div class="booking-success" id="bookingSuccess" style="display:none;">
         <div class="success-content">
           <div class="success-icon" id="successIcon">✓</div>
-          <h3>Booking Confirmed!</h3>
-          <p class="success-hi">आपकी बुकिंग की पुष्टि हो गई है!</p>
-          <p>A confirmation email has been sent. Our team will contact you within 24 hours to finalise your
-            itinerary.</p>
-          <p class="success-hi">पुष्टि ईमेल भेजी गई है। हमारी टीम 24 घंटों में संपर्क करेगी।</p>
+          <h3>Booking Confirmed! / <span style="font-family:var(--font-hindi)">बुकिंग पक्की हो गई!</span></h3>
+          <p>A confirmation email has been sent. Our expert team will contact you within 24 hours to finalise your personalised itinerary.</p>
           <p class="booking-ref">Booking Ref: <strong id="bookingRef">ASHTA-2026-####</strong></p>
-          <a href="#hero" class="btn btn-primary">Explore More / और खोजें</a>
+          <a href="#hero" class="btn btn-primary">Explore More Journeys →</a>
         </div>
       </div>
-    </div>
-  </div>
+
+    </div><!-- /.booking-wrapper -->
+  </div><!-- /.container -->
 </section>

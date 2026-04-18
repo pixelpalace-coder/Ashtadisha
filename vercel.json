@@ -32,6 +32,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/dashboard", "destination": "/dashboard.html" }
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/planner", "destination": "/planner.html" }
   ]
 }

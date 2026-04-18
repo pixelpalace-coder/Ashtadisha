@@ -3,15 +3,51 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Ashtadisha — Gateway to the Seven Sisters | Northeast India Tourism</title>
-  <meta name="description"
-    content="Where Mist Meets Mountain. Where Culture Becomes Journey. Discover Northeast India's 7 Sisters — premium bilingual travel guide.">
-  <meta property="og:title" content="Ashtadisha — Northeast India Tourism">
+  <!-- SEO & Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://ashtadisha.com/">
+  <meta name="description" content="Where Mist Meets Mountain. Where Culture Becomes Journey. Discover Northeast India's 7 Sisters — premium bilingual travel guide.">
+  <meta name="keywords" content="Northeast India, Travel, Seven Sisters, Assam, Meghalaya, Arunachal Pradesh, Sikkim, Tourism, Luxury Travel">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ashtadisha.com/">
+  <meta property="og:title" content="Ashtadisha — Premium Northeast India Tourism">
   <meta property="og:description" content="जहाँ कोहरा पहाड़ से मिलता है। Explore all 7 Sisters of Northeast India.">
+  <meta property="og:image" content="https://ashtadisha.com/assets/auth/auth-bg.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://ashtadisha.com/">
+  <meta property="twitter:title" content="Ashtadisha — Premium Northeast India Tourism">
+  <meta property="twitter:description" content="Where Mist Meets Mountain. Plan your luxury getaway.">
+  <meta property="twitter:image" content="https://ashtadisha.com/assets/auth/auth-bg.png">
 
   <!-- Google Fonts: Cormorant, DM Sans, Playfair, Hind (Devanagari) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  
+  <!-- Production Security: Hide Code & Disable Console -->
+  <script>
+    if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+      // Disable Developer Tools Shortcuts
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      document.addEventListener('keydown', e => {
+        // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+        if (
+          e.key === 'F12' || 
+          (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) ||
+          (e.ctrlKey && e.key.toUpperCase() === 'U')
+        ) {
+          e.preventDefault();
+        }
+      });
+      // Disable Console Output
+      console.log = console.info = console.warn = console.error = console.table = console.debug = console.trace = function() {};
+    }
+  </script>
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Hind:wght@400;500;600&display=swap"
@@ -22,6 +58,8 @@
 
   <!-- Main CSS (imports all sub-stylesheets including auth.css & booking-checkout.css) -->
   <link rel="stylesheet" href="css/main.css">
+  <!-- AI Planner + Booking Modal styles -->
+  <link rel="stylesheet" href="css/planner-page.css">
 
   <!-- ═══════════════════════════════════════════════════
        THIRD-PARTY SDKs  (loaded before <body> content)
@@ -36,8 +74,7 @@
   <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <!-- Three.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <!-- Three.js (removed for performance) -->
 
   <!-- GSAP + ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
@@ -53,7 +90,7 @@
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
 </head>
 
-<body>
+<body class="home-page">
 
   <!-- Scroll Progress Bar -->
   <div class="scroll-progress-bar" id="scrollProgressBar"></div>
@@ -94,7 +131,7 @@
           l.style.visibility = 'hidden';
           setTimeout(function() { l.style.display = 'none'; document.body.style.overflow = ''; }, 600);
         }
-      }, 4500);
+      }, 10000); // 10s allows heavy state background caching
     </script>
   </div>
 
@@ -154,11 +191,13 @@
               Tripura <span class="nav-hi">त्रिपुरा</span></a>
             <a href="#state-arunachal" class="dropdown-item"><span class="state-flag" style="color:#2C3E50">●</span>
               Arunachal <span class="nav-hi">अरुणाचल</span></a>
+            <a href="#state-sikkim" class="dropdown-item"><span class="state-flag" style="color:#117864">●</span>
+              Sikkim <span class="nav-hi">सिक्किम</span></a>
           </div>
         </div>
         <a href="#food" class="nav-link">Food <span class="nav-hi">भोजन</span></a>
         <a href="#shopping" class="nav-link">Shopping <span class="nav-hi">खरीदारी</span></a>
-        <a href="#ai-planner" class="nav-link">AI Planner <span class="nav-hi">AI प्लानर</span></a>
+        <a href="/planner.html" class="nav-link">AI Planner <span class="nav-hi">AI प्लानर</span></a>
 
         <!-- ── Auth Area ── -->
         <!-- PRE-LOGIN: Sign In + Book Now -->
@@ -169,7 +208,7 @@
 
         <!-- POST-LOGIN: My Trips link + Avatar chip -->
         <div class="nav-auth-post hidden" id="navAuthPost">
-          <a href="dashboard.html" class="nav-mytrips-link">My Trips</a>
+          <a href="/dashboard.html" class="nav-mytrips-link">My Trips</a>
           <div class="nav-user-chip" id="navUserChip" role="button" aria-expanded="false" aria-haspopup="true">
             <div class="nav-avatar" id="navUserAvatar">T</div>
             <span class="nav-user-name" id="navUserName">Traveler</span>
@@ -209,7 +248,8 @@
       <a href="#seven-sisters" class="mobile-nav-link">7 Sisters / 7 बहनें</a>
       <a href="#food" class="mobile-nav-link">Cuisine / व्यंजन</a>
       <a href="#shopping" class="mobile-nav-link">Shopping / खरीदारी</a>
-      <a href="#ai-planner" class="mobile-nav-link">AI Planner / AI प्लानर</a>
+      <a href="/planner.html" class="mobile-nav-link">AI Planner / AI प्लानर</a>
+      <a href="#popular-packages" class="mobile-nav-link">Packages / पैकेज</a>
       <a href="#booking" class="mobile-nav-link cta-mobile">Book Tour / बुक करें</a>
       <!-- Mobile sign in (shown when logged out) -->
       <button class="mobile-nav-link" id="mobileSignInBtn" style="background:none;border:none;color:rgba(255,255,255,0.9);font-family:var(--font-display);font-size:2rem;font-weight:700;">
@@ -217,6 +257,14 @@
       </button>
     </div>
   </div>
+
+  <!-- Mobile quick navigation (always-visible escape hatch: home / packages / book / menu) -->
+  <nav class="mobile-quick-nav" id="mobileQuickNav" aria-label="Quick navigation">
+    <a href="#hero" class="mqn-link">Home</a>
+    <a href="#popular-packages" class="mqn-link">Packages</a>
+    <a href="#booking" class="mqn-link">Book</a>
+    <button type="button" class="mqn-link mqn-menu-btn" id="mqnOpenMenu" aria-label="Open or close menu">Menu</button>
+  </nav>
 
   <!-- Dynamic Content Root -->
   <main id="app-root"></main>
@@ -309,176 +357,19 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       BOOKING CHECKOUT MODAL
-       ═══════════════════════════════════════════════════════════ -->
-  <div class="checkout-overlay" id="checkoutOverlay" role="dialog" aria-modal="true" aria-label="Book your journey">
-    <div class="checkout-modal" id="checkoutModal">
-
-      <!-- Header -->
-      <div class="checkout-header">
-        <h2 class="checkout-title">Book Your Journey</h2>
-        <button class="checkout-close" id="checkoutClose" aria-label="Close">✕</button>
-      </div>
-
-      <!-- Step Progress -->
-      <div class="checkout-steps" role="tablist">
-        <div class="co-step active" data-step="1">
-          <span class="co-step-num">1</span>
-          <span class="co-step-label">Trip Details</span>
-        </div>
-        <div class="co-step" data-step="2">
-          <span class="co-step-num">2</span>
-          <span class="co-step-label">Payment</span>
-        </div>
-        <div class="co-step" data-step="3">
-          <span class="co-step-num">3</span>
-          <span class="co-step-label">Confirmed</span>
-        </div>
-      </div>
-
-      <!-- Step Panels -->
-      <div class="checkout-panels">
-
-        <!-- ── Step 1: Trip Summary ── -->
-        <div class="co-panel active" data-step="1">
-
-          <!-- Package Card -->
-          <div class="co-package-summary">
-            <img class="co-pkg-icon" id="coPkgImg" src="" alt="Package">
-            <div class="co-pkg-info">
-              <h3 id="coPkgName">Package Name</h3>
-              <p id="coPkgDuration">Duration · Destination</p>
-            </div>
-            <div class="co-pkg-price-tag">
-              <span class="price" id="coPkgPrice">₹0</span>
-              <span class="per-person">per person</span>
-            </div>
-          </div>
-
-          <!-- Travelers Stepper -->
-          <div class="co-field-group">
-            <label class="co-field-label">Number of Travelers</label>
-            <div class="traveler-stepper">
-              <button class="stepper-btn" id="coTravelerMinus" aria-label="Decrease travelers">−</button>
-              <span class="stepper-value" id="coTravelerCount">2</span>
-              <button class="stepper-btn" id="coTravelerPlus" aria-label="Increase travelers">+</button>
-            </div>
-          </div>
-
-          <!-- Travel Month -->
-          <div class="co-field-group">
-            <label class="co-field-label" for="coTravelMonth">Preferred Travel Month</label>
-            <select class="co-input" id="coTravelMonth">
-              <option value="">— Select Month —</option>
-              <option>January</option><option>February</option><option>March</option>
-              <option>April</option><option>May</option><option>June</option>
-              <option>July</option><option>August</option><option>September</option>
-              <option>October</option><option>November</option><option>December</option>
-            </select>
-          </div>
-
-          <!-- Special Requests -->
-          <div class="co-field-group">
-            <label class="co-field-label" for="coSpecialReqs">Special Requests <span style="opacity:.5;font-size:.85em;">(optional)</span></label>
-            <textarea class="co-input" id="coSpecialReqs" rows="3"
-              placeholder="Dietary needs, accessibility, medical requirements..."></textarea>
-          </div>
-
-          <!-- Total -->
-          <div class="co-total-display">
-            <div>
-              <div class="co-total-label">Estimated Total</div>
-              <div style="font-size:0.8rem;opacity:0.65;margin-top:2px;">Based on per-person rate</div>
-            </div>
-            <div class="co-total-amount" id="coTotalAmount">₹0</div>
-          </div>
-
-          <!-- Nav -->
-          <div class="co-step-nav" style="justify-content:flex-end;">
-            <button class="co-btn-next" id="coNext1">Proceed to Payment →</button>
-          </div>
-        </div>
-
-        <!-- ── Step 2: Payment ── -->
-        <div class="co-panel" data-step="2">
-
-          <!-- Order Recap -->
-          <div class="co-order-recap">
-            <div class="co-recap-row"><span class="rLabel">Package</span><span id="coRecapPkg">—</span></div>
-            <div class="co-recap-row"><span class="rLabel">Destination</span><span id="coRecapDest">—</span></div>
-            <div class="co-recap-row"><span class="rLabel">Travelers</span><span id="coRecapTravelers">—</span></div>
-            <div class="co-recap-row"><span class="rLabel">Travel Month</span><span id="coRecapMonth">—</span></div>
-            <div class="co-recap-row"><span class="rLabel"><strong>Total Amount</strong></span><span id="coRecapTotal" style="color:var(--color-accent);font-weight:700;">—</span></div>
-          </div>
-
-          <!-- Pay Button -->
-          <button class="co-pay-btn" id="coPayBtn">Pay ₹0</button>
-
-          <!-- Trust Badges -->
-          <div class="co-trust-badges">
-            <span class="co-trust-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              SSL Secured
-            </span>
-            <span class="co-trust-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              Razorpay Certified
-            </span>
-            <span class="co-trust-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg>
-              100% Refundable 48hrs
-            </span>
-          </div>
-
-          <!-- Nav -->
-          <div class="co-step-nav">
-            <button class="co-btn-back" id="coBack2">← Back</button>
-          </div>
-        </div>
-
-        <!-- ── Step 3: Confirmation ── -->
-        <div class="co-panel" data-step="3">
-          <div class="co-confirm-panel">
-
-            <!-- Animated Checkmark (populated by JS) -->
-            <div id="coCheckAnimContainer"></div>
-
-            <h3 class="co-confirm-heading">Booking Confirmed!</h3>
-            <p class="co-confirm-sub">
-              Your adventure to Northeast India is booked. Our team will contact you within 24 hours
-              to finalise your personalised itinerary.
-            </p>
-
-            <div class="co-booking-id" id="coBookingId">Booking Ref: ASHTA-—</div>
-
-            <div class="co-confirm-actions">
-              <button class="co-action-btn primary" id="coViewTripsBtn">View My Trips</button>
-              <button class="co-action-btn outline" id="coDownloadBtn">⬇ Download Confirmation</button>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /checkout-panels -->
-    </div><!-- /checkout-modal -->
-  </div><!-- /checkout-overlay -->
-
-  <!-- ═══════════════════════════════════════════════════════════
-       APP SCRIPTS
-       Order: site modules → Firebase → auth → payment → checkout
-       ═══════════════════════════════════════════════════════════ -->
+  <!-- Checkout modal (outside app-root — same pattern as dashboard) -->
+  <div id="checkoutMount"></div>
 
   <!-- Existing site module system -->
   <script type="module" src="js/main.js" defer></script>
 
   <!-- New integration scripts (non-module, CDN-style globals) -->
   <script src="js/firebase.js" defer></script>
+  <script src="js/booking-package.js" defer></script>
+  <script src="data/packages.js" defer></script>
   <script src="js/auth.js" defer></script>
   <script src="js/payment.js" defer></script>
   <script src="js/booking-checkout.js" defer></script>
 
 </body>
-
-</body>
-
 </html>

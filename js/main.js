@@ -1,8 +1,8 @@
 import { ComponentLoader } from './componentLoader.js';
 import { initAnimations } from './animations.js';
 import { initUI } from './ui.js';
-import { initPlanner } from './planner.js';
 import { initBooking } from './booking.js';
+import { initPopularPackages } from './popular-packages.js';
 
 /**
  * Main Application Entrance
@@ -35,9 +35,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Load Components into the DOM
     await loader.loadAll();
 
+    const checkoutMount = document.getElementById('checkoutMount');
+    if (checkoutMount) {
+        try {
+            const res = await fetch('components/checkout.html');
+            if (res.ok) checkoutMount.innerHTML = await res.text();
+        } catch (e) {
+            console.error('[main] Checkout inject failed', e);
+        }
+    }
+
+    // Do not bulk-preload every image — that caused long freezes and scroll jank.
+    // Hero/above-fold assets stay in HTML; other images use lazy loading in markup where possible.
+
     // 3. Initialize App Logic after components are injected
     initAnimations();
     initUI();
-    initPlanner();
     initBooking();
+    initPopularPackages();
 });

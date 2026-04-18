@@ -21,7 +21,9 @@ export class ComponentLoader {
       'food',
       'shopping',
       'when',
-      'ai-planner',
+      'planner-cta',
+      'popular-packages',
+      'cta-planner',
       'booking',
       'footer'
     ];

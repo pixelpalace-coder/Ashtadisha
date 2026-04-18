@@ -1,19 +1,28 @@
 /* ============================================================
-   ASHTADISHA — Firebase Integration
-   js/firebase.js
+   ASHTADISHA — Python Backend API Integration
+   js/firebase.js 
+
+   (Previously handled Firebase, now routes exactly the same
+   surface API to a local Python + MySQL backend).
    
-   Uses Firebase v9 compat SDK (loaded via CDN in index.html).
-   Exposes window.AshtaFirebase for use by other modules.
-   
-   PLACEHOLDER CONFIG — replace with real values from:
-   https://console.firebase.google.com
+   Auth: Handled by Firebase Client SDK
+   Database: Handled by Python API Backend
    ============================================================ */
 
 (function () {
   'use strict';
 
-  // ── Firebase Config ────────────────────────────────────────
-  // ⚠️  REPLACE with your real Firebase project config
+  // ── Environment ───────────────────────────────────────────
+  const API_BASE_URL = 'http://localhost:5000/api';
+  const MOCK_PACKAGES = {
+    complete: { id: 'complete', name: 'The Complete 7 Sisters', destination: 'All 7 States', duration: '14 Days', pricePerPerson: 89000, image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=400&q=75', source: 'PREDEFINED' },
+    assam_megh: { id: 'assam_megh', name: 'Assam + Meghalaya Escape', destination: 'Assam & Meghalaya', duration: '7 Days', pricePerPerson: 42500, image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=400&q=75', source: 'PREDEFINED' },
+    arunachal: { id: 'arunachal', name: 'Arunachal Deep Dive', destination: 'Arunachal Pradesh', duration: '9 Days', pricePerPerson: 58500, image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=400&q=75', source: 'PREDEFINED' }
+  };
+  const MOCK_KEY = 'ashta_mock_bookings';
+  
+  // Keep Firebase Init for Auth (Google/Facebook Login purposes)
+  // ⚠️  REPLACE with your real Firebase project config if Auth resets
   const FIREBASE_CONFIG = {
     apiKey:            "AIzaSyBLnnFOpRXH4N-EOmuFxpAajdku0CncG8k",
     authDomain:        "ashtadisha-2005.firebaseapp.com",
@@ -23,222 +32,215 @@
     appId:             "1:633104850688:web:dd25c42fff6fd3d2d55de5"
   };
 
-  // ── Init ──────────────────────────────────────────────────
-  let db, storage, initialized = false;
+  let initialized = false;
 
   function init() {
     if (initialized) return;
     try {
       if (!window.firebase) {
-        console.warn('[AshtaFirebase] Firebase SDK not loaded yet.');
+        console.warn('[AshtaAPI] Firebase Client SDK for Auth not loaded.');
         return;
       }
-      // Only initialize if not already done
       if (!firebase.apps.length) {
         firebase.initializeApp(FIREBASE_CONFIG);
       }
-      db      = firebase.firestore();
-      storage = firebase.storage();
       initialized = true;
-      console.log('[AshtaFirebase] Initialized ✓');
+      console.log('[AshtaAPI] Auth Initialized ✓ / DB routed to Python API ✓');
     } catch (e) {
-      console.error('[AshtaFirebase] Init error:', e);
+      console.error('[AshtaAPI] Init error:', e);
     }
   }
 
-  // ── Timestamp helper ─────────────────────────────────────
-  function now() {
-    return firebase.firestore.FieldValue.serverTimestamp();
-  }
-
-  // ── saveUser ─────────────────────────────────────────────
-  /**
-   * Upsert a user document in Firestore when they sign in.
-   * Ensures the user's name is collected and stored correctly.
-   */
-  async function saveUser(fbUser) {
-    if (!initialized) { init(); if (!initialized) return; }
+  // ── Internal Fetch Helper ─────────────────────────────────
+  async function apiPost(endpoint, payload) {
     try {
-      const uid = fbUser.uid;
-      const userRef = db.collection('users').doc(uid);
-      const snap = await userRef.get();
-
-      // Priority: Firestore name > Auth displayName > email prefix
-      let storedName = snap.exists ? snap.data().name : null;
-      let name = storedName || fbUser.displayName || fbUser.email.split('@')[0] || 'Traveler';
-
-      const data = {
-        uid,
-        name,
-        email:     fbUser.email || '',
-        photoURL:  fbUser.photoURL || '',
-        updatedAt: now(),
-      };
-
-      if (!snap.exists) {
-        data.createdAt     = now();
-        data.totalBookings = 0;
-        await userRef.set(data);
-        console.log('[AshtaFirebase] New user created:', uid);
-      } else {
-        await userRef.update({
-          email:     data.email,
-          photoURL:  data.photoURL,
-          updatedAt: data.updatedAt,
-        });
-        console.log('[AshtaFirebase] User synced:', uid);
-      }
-      return data;
-    } catch (e) {
-      console.error('[AshtaFirebase] saveUser error:', e);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch (err) {
+      console.error(`[AshtaAPI] Fetch Error on POST ${endpoint}:`, err);
       return null;
     }
   }
 
-  // ── saveEnquiry ───────────────────────────────────────────
+  async function apiGet(endpoint) {
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch (err) {
+      console.error(`[AshtaAPI] Fetch Error on GET ${endpoint}:`, err);
+      return null;
+    }
+  }
+
+  function getMockBookingsStore() {
+    try {
+      return JSON.parse(localStorage.getItem(MOCK_KEY) || '{}');
+    } catch {
+      return {};
+    }
+  }
+
+  function setMockBookingsStore(value) {
+    localStorage.setItem(MOCK_KEY, JSON.stringify(value));
+  }
+
+  // ── Database Methods (Now routing to Python/MySQL) ────────
+
   /**
-   * Save a contact/AI-planner enquiry to Firestore.
-   * @param {Object} data - { name, email, phone, destination, travelMonth, message }
-   * @returns {string|null} - The new document ID, or null on error
+   * Upsert a user document in MySQL when they sign in.
+   */
+  async function saveUser(fbUser, customName = null) {
+    if (!initialized) { init(); }
+    const uid = fbUser.uid;
+    const name = customName || fbUser.displayName || fbUser.email.split('@')[0] || 'Traveler';
+    
+    const payload = {
+      uid: uid,
+      name: name,
+      email: fbUser.email || '',
+      photoURL: fbUser.photoURL || ''
+    };
+
+    const res = await apiPost('/users', payload);
+    if (res && res.success) {
+      console.log(`[AshtaAPI] User ${res.action} in MySQL:`, uid);
+      return payload;
+    }
+    return null;
+  }
+
+  /**
+   * Save a contact/enquiry to MySQL.
    */
   async function saveEnquiry(data) {
-    if (!initialized) { init(); if (!initialized) return null; }
-    try {
-      const docRef = await db.collection('enquiries').add({
-        ...data,
-        status:    'new',
-        createdAt: now(),
-      });
-      console.log('[AshtaFirebase] Enquiry saved:', docRef.id);
-      return docRef.id;
-    } catch (e) {
-      console.error('[AshtaFirebase] saveEnquiry error:', e);
-      return null;
+    const res = await apiPost('/enquiries', data);
+    if (res && res.success) {
+      console.log('[AshtaAPI] Enquiry saved in MySQL:', res.id);
+      return res.id;
     }
+    return null;
   }
 
-  // ── createBooking ──────────────────────────────────────────
   /**
-   * Create a booking document after successful Razorpay payment.
-   * @param {Object} bookingData - { userId, packageName, destination, travelers,
-   *                                 travelDate, totalAmount, paymentId, ... }
-   * @returns {string|null} - The booking document ID (used as Booking Ref)
+   * Create a booking document after payment.
    */
   async function createBooking(bookingData) {
-    if (!initialized) { init(); if (!initialized) return null; }
-    try {
-      const docRef = await db.collection('bookings').add({
-        ...bookingData,
-        status:    'confirmed',
-        createdAt: now(),
-      });
-
-      // Increment user's totalBookings counter
-      if (bookingData.userId) {
-        const userRef = db.collection('users').doc(bookingData.userId);
-        await userRef.update({
-          totalBookings: firebase.firestore.FieldValue.increment(1),
-        });
-      }
-
-      console.log('[AshtaFirebase] Booking created:', docRef.id);
-      return docRef.id;
-    } catch (e) {
-      console.error('[AshtaFirebase] createBooking error:', e);
-      return null;
+    const res = await apiPost('/bookings', bookingData);
+    if (res && res.success) {
+      console.log('[AshtaAPI] Booking created in MySQL:', res.id);
+      return res.id;
     }
+
+    const store = getMockBookingsStore();
+    const list = Array.isArray(store[bookingData.userId]) ? store[bookingData.userId] : [];
+    const localId = Date.now();
+    list.unshift({
+      id: localId,
+      ...bookingData,
+      createdAt: new Date().toISOString(),
+      status: bookingData.status || 'confirmed'
+    });
+    store[bookingData.userId] = list;
+    setMockBookingsStore(store);
+    console.warn('[AshtaAPI] Backend unavailable, booking saved locally.');
+    return localId;
   }
 
-  // ── getUserBookings ───────────────────────────────────────
   /**
-   * Fetch all bookings for a given user UID, ordered newest first.
-   * @param {string} uid
-   * @returns {Array} - Array of booking objects with .id fields
+   * Fetch a single user profile from MySQL via Python API.
+   */
+  async function getUserProfile(uid) {
+    const res = await apiGet(`/users/${uid}`);
+    if (res) return res;
+    return {
+      uid,
+      name: "Traveler",
+      email: "",
+      photoURL: "",
+      city: "",
+      totalBookings: 0
+    };
+  }
+
+  /**
+   * Fetch all bookings for a user from MySQL.
    */
   async function getUserBookings(uid) {
-    if (!initialized) { init(); if (!initialized) return []; }
-    try {
-      const snap = await db.collection('bookings')
-        .where('userId', '==', uid)
-        .orderBy('createdAt', 'desc')
-        .get();
-
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (e) {
-      console.error('[AshtaFirebase] getUserBookings error:', e);
-      return [];
+    const res = await apiGet(`/bookings/${uid}`);
+    if (res && Array.isArray(res)) {
+       return res;
     }
+    const store = getMockBookingsStore();
+    return Array.isArray(store[uid]) ? store[uid] : [];
   }
 
-  // ── updateUserProfile ────────────────────────────────────
   /**
-   * Merge-update a user's profile fields.
+   * Partial profile update.
    */
   async function updateUserProfile(uid, data) {
-    if (!initialized) { init(); if (!initialized) return; }
-    try {
-      await db.collection('users').doc(uid).set({
-        ...data,
-        updatedAt: now(),
-      }, { merge: true });
-      
-      // Also update Firebase Auth profile if name changed
-      if (data.name) {
+    const payload = { uid: uid, ...data };
+    const res = await apiPost('/users', payload);
+    if (res && res.success) {
+      console.log('[AshtaAPI] Profile updated in MySQL:', uid);
+      // Also update Auth profile fallback
+      if (data.name && window.firebase) {
         const user = firebase.auth().currentUser;
         if (user && user.uid === uid) {
           await user.updateProfile({ displayName: data.name });
         }
       }
-      console.log('[AshtaFirebase] Profile updated:', uid);
-    } catch (e) {
-      console.error('[AshtaFirebase] updateUserProfile error:', e);
     }
   }
 
-  // ── getPackages ───────────────────────────────────────────
   /**
-   * Fetch all travel packages from Firestore.
+   * Fetch all travel packages from MySQL.
    */
   async function getPackages() {
-    if (!initialized) { init(); if (!initialized) return []; }
-    try {
-      const snap = await db.collection('packages').get();
-      const packages = {};
-      snap.forEach(doc => {
-        packages[doc.id] = { id: doc.id, ...doc.data() };
+    const res = await apiGet('/packages');
+    if (res && Object.keys(res).length) {
+      const normalized = {};
+      Object.entries(res).forEach(([key, pkg]) => {
+        const id = pkg.id || key;
+        normalized[id] = {
+          id,
+          name: pkg.name || pkg.title || 'Northeast Journey',
+          destination: pkg.destination || 'Northeast India',
+          duration: pkg.duration || '7 Days',
+          pricePerPerson: Number(pkg.pricePerPerson ?? pkg.price ?? 0),
+          image: pkg.image || 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=400&q=75',
+          source: 'PREDEFINED'
+        };
       });
-      return packages;
-    } catch (e) {
-      console.error('[AshtaFirebase] getPackages error:', e);
-      return {};
+      return normalized;
     }
+    return MOCK_PACKAGES;
   }
 
-  // ── uploadReceiptBlob ──────────────────────────────────────
   /**
-   * Upload an HTML receipt Blob to Firebase Storage.
-   * @param {Blob} blob
-   * @param {string} bookingId
-   * @returns {string|null} - Download URL, or null on error
+   * Fake upload logic as we removed Firebase cloud storage. 
+   * A true backend implementation would POST a blob file here.
    */
   async function uploadReceiptBlob(blob, bookingId) {
-    if (!initialized) { init(); if (!initialized) return null; }
-    try {
-      const ref = storage.ref(`receipts/${bookingId}.html`);
-      await ref.put(blob, { contentType: 'text/html' });
-      const url = await ref.getDownloadURL();
-      console.log('[AshtaFirebase] Receipt uploaded:', url);
-      return url;
-    } catch (e) {
-      console.error('[AshtaFirebase] uploadReceiptBlob error:', e);
-      return null;
-    }
+    const url = "local_storage_receipt.html"; 
+    console.log('[AshtaAPI] Receipt saved locally (Placeholder):', url);
+    return url;
   }
 
   // ── Expose Public API ─────────────────────────────────────
+  // Keeping the object name AshtaFirebase so we don't break
+  // other JS files (booking-checkout.js, auth.js) that call it.
   window.AshtaFirebase = {
     init,
     saveUser,
+    getUserProfile,
     saveEnquiry,
     createBooking,
     getUserBookings,
@@ -247,11 +249,9 @@
     getPackages,
   };
 
-  // Auto-init when DOM is ready (Firebase CDN may still be loading)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
-    // Small delay to ensure Firebase CDN scripts have executed
     setTimeout(init, 100);
   }
 

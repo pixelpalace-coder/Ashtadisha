@@ -1,32 +1,38 @@
 export function initAnimations() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+
     // 1. GSAP Plugin Registration
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
     }
 
-    // 2. AOS Init
+    // 2. AOS Init — lighter on tablets; disabled on small phones via CSS too
     if (typeof AOS !== 'undefined') {
         AOS.init({ 
-            duration: 600, 
+            duration: 500, 
             once: true, 
-            offset: 50,
+            offset: 40,
             mirror: false,
-            disable: window.innerWidth < 768
+            disable: window.innerWidth < 768 || prefersReducedMotion
         });
     }
 
-    // 3. Lenis Smooth Scroll
-    let lenis;
-    if (typeof Lenis !== 'undefined') {
+    // 3. Lenis — skip on touch-first devices (major scroll jank fix) and reduced-motion
+    let lenis = null;
+    const useLenis = typeof Lenis !== 'undefined' && !isCoarsePointer && !prefersReducedMotion;
+
+    if (useLenis) {
         lenis = new Lenis({
-            duration: 1.0,
+            duration: 0.85,
             easing: (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
             orientation: 'vertical',
             gestureOrientation: 'vertical',
             smoothWheel: true,
             smoothTouch: false,
             touchMultiplier: 1.5,
-            wheelMultiplier: 0.9,
+            wheelMultiplier: 0.85,
             infinite: false,
         });
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
@@ -36,20 +42,23 @@ export function initAnimations() {
             lenis.on('scroll', ScrollTrigger.update);
             gsap.ticker.lagSmoothing(0);
         }
-        
-        // Wait for loader to finish then start lenis.
-        // It's started natively via window event or we can just start it directly since loader pauses native overflow.
-        // Let's assume lenis runs constantly but overflow: hidden handles lock
     } else {
         document.documentElement.style.scrollBehavior = 'smooth';
     }
 
-    // 4. Scroll Progress Bar
+    // 4. Scroll progress bar — rAF-throttled to avoid layout thrash
     const progressBar = document.getElementById('scrollProgressBar');
+    let progressTicking = false;
     window.addEventListener('scroll', () => {
-        if (!progressBar) return;
-        const scrolled = (document.documentElement.scrollTop / (document.documentElement.scrollHeight - document.documentElement.clientHeight)) * 100;
-        progressBar.style.width = scrolled + '%';
+        if (!progressBar || progressTicking) return;
+        progressTicking = true;
+        requestAnimationFrame(() => {
+            progressTicking = false;
+            const doc = document.documentElement;
+            const max = doc.scrollHeight - doc.clientHeight;
+            const scrolled = max > 0 ? (doc.scrollTop / max) * 100 : 0;
+            progressBar.style.width = scrolled + '%';
+        });
     }, { passive: true });
 
     // 5. Hero Typewriter
@@ -124,16 +133,8 @@ export function initAnimations() {
     }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
     revealEls.forEach(el => revealObserver.observe(el));
 
-    // 8. GSAP Scroll Animations
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        document.querySelectorAll('.state-hero-banner').forEach(banner => {
-            gsap.to(banner, {
-                backgroundPositionY: '30%',
-                ease: 'none',
-                scrollTrigger: { trigger: banner, start: 'top bottom', end: 'bottom top', scrub: 2 }
-            });
-        });
-
+    // 8. GSAP Scroll Animations — skip on touch to reduce main-thread work
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !isCoarsePointer) {
         ScrollTrigger.batch('.about-text p', {
             onEnter: batch => gsap.from(batch, { opacity: 0, y: 30, duration: 0.8, stagger: 0.15, ease: 'power2.out', overwrite: true }),
             start: 'top 80%',
@@ -147,17 +148,22 @@ export function initAnimations() {
         });
     }
 
-    // 9. Magnetic Buttons (GSAP)
-    if (typeof gsap !== 'undefined') {
+    // 9. Magnetic Buttons (GSAP) — pointer devices only
+    if (typeof gsap !== 'undefined' && isFinePointer) {
         const magneticEls = document.querySelectorAll('.nav-link, .btn, .meta-pill, .pill, .thumb, .logo, .shop-tab');
         magneticEls.forEach(el => {
+            let rect;
+            el.addEventListener('mouseenter', () => {
+                rect = el.getBoundingClientRect();
+            }, { passive: true });
             el.addEventListener('mousemove', (e) => {
-                const rect = el.getBoundingClientRect();
+                if (!rect) return;
                 const x = e.clientX - rect.left - rect.width / 2;
                 const y = e.clientY - rect.top - rect.height / 2;
                 gsap.to(el, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: 'power2.out' });
             }, { passive: true });
             el.addEventListener('mouseleave', () => {
+                rect = null;
                 gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.4)' });
             }, { passive: true });
         });

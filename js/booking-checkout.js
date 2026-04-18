@@ -1,392 +1,437 @@
-/* ============================================================
-   ASHTADISHA — Booking Checkout Modal Logic
-   js/booking-checkout.js
-
-   Manages the 3-step checkout modal:
-   Step 1 → Trip summary + travelers + month
-   Step 2 → Order recap + Razorpay trigger
-   Step 3 → Confirmation + receipt download
-   ============================================================ */
-
 (function () {
   'use strict';
 
-  // ── Package Data ─────────────────────────────────────────
-  // Initialized from Firestore
-  let PACKAGES = {};
+  var GST_RATE = 0.05;
+  var PACKAGES = {};
+
+  function mergePredefinedCatalog() {
+    if (!window.AshtaPredefinedPackages || !Array.isArray(window.AshtaPredefinedPackages)) return;
+    window.AshtaPredefinedPackages.forEach(function (p) {
+      if (!p || !p.id) return;
+      PACKAGES[p.id] = {
+        id: p.id,
+        name: p.title,
+        title: p.title,
+        destination: p.destination || 'Northeast India',
+        duration: p.duration,
+        pricePerPerson: Number(p.price) || 0,
+        image: p.image,
+        description: p.description || '',
+        source: 'PREDEFINED'
+      };
+    });
+  }
 
   async function initPackages() {
     try {
       if (window.AshtaFirebase && typeof window.AshtaFirebase.getPackages === 'function') {
-        const fetched = await window.AshtaFirebase.getPackages();
+        var fetched = await window.AshtaFirebase.getPackages();
         if (fetched && Object.keys(fetched).length > 0) {
           PACKAGES = fetched;
-          console.log('[AshtaCheckout] Packages loaded from Firestore:', PACKAGES);
+          mergePredefinedCatalog();
           return;
         }
       }
     } catch (e) {
-      console.warn('[AshtaCheckout] Firestore package fetch failed, using fallbacks.', e);
+      console.warn('[AshtaCheckout] Fetch failed, using fallbacks.', e);
     }
 
-    // Fallbacks if Firestore fails or is empty
     PACKAGES = {
-      complete: {
-        id: 'complete',
-        name: 'The Complete 7 Sisters',
-        destination: 'All 7 Northeast States',
-        duration: '14 Days · 13 Nights',
-        pricePerPerson: 85000,
-        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=80&q=70',
-      },
-      assam_megh: {
-        id: 'assam_megh',
-        name: 'Assam + Meghalaya',
-        destination: 'Assam & Meghalaya',
-        duration: '7 Days · 6 Nights',
-        pricePerPerson: 42000,
-        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=80&q=70',
-      },
-      arunachal: {
-        id: 'arunachal',
-        name: 'Arunachal Monastery Trek',
-        destination: 'Arunachal Pradesh',
-        duration: '9 Days · 8 Nights',
-        pricePerPerson: 55000,
-        image: 'https://images.unsplash.com/photo-1543158181-e6f9f6712055?auto=format&fit=crop&w=80&q=70',
-      }
+      complete: { id: 'complete', name: 'The Complete 7 Sisters', destination: 'All 7 States', duration: '14 Days', pricePerPerson: 85000, image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=400&q=75', source: 'PREDEFINED' },
+      assam_megh: { id: 'assam_megh', name: 'Assam + Meghalaya', destination: 'Assam & Meghalaya', duration: '7 Days', pricePerPerson: 42000, image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=400&q=75', source: 'PREDEFINED' }
     };
+    mergePredefinedCatalog();
   }
 
-  // Auto-init packages
-  initPackages();
+  var currentPkg = null;
+  var travelers = 2;
+  var travelMonth = '';
+  var travelDate = '';
+  var specialReqs = '';
+  var guestName = '';
+  var guestEmail = '';
+  var guestPhone = '';
+  var currentStep = 1;
+  var subtotalAmount = 0;
+  var gstAmount = 0;
+  var totalWithGst = 0;
+  var eventsBound = false;
 
-  // ── State ─────────────────────────────────────────────────
-  let currentPkg   = null;
-  let travelers    = 2;
-  let travelMonth  = '';
-  let specialReqs  = '';
-  let currentStep  = 1;
-  let lastBookingId = null;
-  let lastPaymentId = null;
+  var el = function (id) { return document.getElementById(id); };
+  var qAll = function (sel) { return document.querySelectorAll(sel); };
 
-  // ── DOM ───────────────────────────────────────────────────
-  const overlay      = () => document.getElementById('checkoutOverlay');
-  const modal        = () => document.getElementById('checkoutModal');
-  const stepPanels   = () => document.querySelectorAll('.co-panel');
-  const stepDots     = () => document.querySelectorAll('.co-step');
+  function normalizePkg(raw) {
+    if (window.AshtaBookingPackage && typeof window.AshtaBookingPackage.normalize === 'function') {
+      return window.AshtaBookingPackage.normalize(raw);
+    }
+    return null;
+  }
 
-  // ── Open Modal ────────────────────────────────────────────
-  function open(packageKeyOrData) {
-    // Auth gate — require sign-in
-    if (!window.AshtaAuth?.isSignedIn()) {
-      window._pendingCheckoutData = packageKeyOrData;
-      window.AshtaAuth?.openAuthModal('signin');
+  function buildStoredItinerary() {
+    if (!window.AshtaBookingPackage || !window.AshtaBookingPackage.buildStoredItinerary) {
+      return (currentPkg && currentPkg.itineraryText) || '';
+    }
+    var meta = {
+      v: 1,
+      source: currentPkg.source === 'AI' ? 'AI' : 'PREDEFINED',
+      guestName: guestName,
+      guestEmail: guestEmail,
+      guestPhone: guestPhone,
+      status: 'CONFIRMED',
+      travelers: travelers,
+      travelWindow: currentPkg.source === 'AI' ? travelDate : travelMonth,
+      specialReqs: specialReqs
+    };
+    var html = (currentPkg.itineraryText || '').trim();
+    return window.AshtaBookingPackage.buildStoredItinerary(meta, html);
+  }
+
+  function isAI() {
+    return currentPkg && currentPkg.source === 'AI';
+  }
+
+  async function open(data) {
+    await initPackages();
+
+    if (!window.AshtaBookingPackage || typeof window.AshtaBookingPackage.normalize !== 'function') {
+      alert('Booking module failed to load. Please refresh the page.');
       return;
     }
 
-    // Resolve package data
-    if (typeof packageKeyOrData === 'string') {
-      currentPkg = PACKAGES[packageKeyOrData] || PACKAGES.complete;
-    } else if (typeof packageKeyOrData === 'object') {
-      currentPkg = packageKeyOrData;
-    } else {
-      currentPkg = PACKAGES.complete;
+    if (!el('checkoutOverlay')) {
+      bindEvents();
+    }
+    if (!el('checkoutOverlay')) {
+      alert('Checkout is still loading. Please try again in a moment.');
+      return;
     }
 
-    // Reset state
-    travelers   = 2;
+    var isSignedIn = window.AshtaAuth
+      ? window.AshtaAuth.isSignedIn()
+      : !!(window.firebase && firebase.auth && firebase.auth().currentUser);
+
+    if (!isSignedIn) {
+      window._pendingCheckoutData = data;
+      window.AshtaAuth && window.AshtaAuth.openAuthModal('signin');
+      if (!window.AshtaAuth) {
+        alert('Please sign in from the home page to continue booking.');
+      }
+      return;
+    }
+
+    var raw = data;
+    if (typeof data === 'string') {
+      var fromStore = PACKAGES[data];
+      raw = fromStore
+        ? Object.assign({}, fromStore, { source: 'PREDEFINED', packageId: data })
+        : { name: 'Northeast Journey', destination: 'Northeast India', duration: '7 Days', pricePerPerson: 25000, source: 'PREDEFINED', packageId: data };
+    }
+
+    currentPkg = normalizePkg(raw);
+    if (!currentPkg) {
+      alert('Could not load this package. Ensure booking-package.js is loaded.');
+      return;
+    }
+
+    if (currentPkg.travelers != null) {
+      travelers = Math.max(1, Number(currentPkg.travelers));
+    } else {
+      travelers = 2;
+    }
+
     travelMonth = '';
+    travelDate = currentPkg.travelDate || '';
     specialReqs = '';
+    guestName = '';
+    guestEmail = '';
+    guestPhone = '';
+
+    var user = firebase.auth && firebase.auth().currentUser;
+    if (user) {
+      guestEmail = user.email || '';
+      guestName = user.displayName || '';
+    }
+
+    if (!isAI() && travelDate) {
+      var parsed = new Date(travelDate);
+      if (!Number.isNaN(parsed.getTime())) {
+        travelMonth = parsed.toLocaleString('en-US', { month: 'long' });
+      }
+    }
+
+    el('coModalTitle').textContent = isAI() ? 'Book your AI itinerary' : 'Book your journey';
+    el('coMonthGroup').classList.toggle('hidden', isAI());
+    el('coDateGroup').classList.toggle('hidden', !isAI());
+
+    var pill = el('coSourcePill');
+    if (pill) {
+      pill.textContent = isAI() ? 'AI plan' : 'PREDEFINED';
+      pill.classList.toggle('hidden', false);
+    }
+
+    if (el('coTravelMonth')) el('coTravelMonth').value = '';
+    if (el('coTravelDate')) el('coTravelDate').value = travelDate || '';
+    if (el('coGuestName')) el('coGuestName').value = guestName;
+    if (el('coGuestEmail')) el('coGuestEmail').value = guestEmail;
+    if (el('coGuestPhone')) el('coGuestPhone').value = guestPhone;
 
     populateStep1();
     goToStep(1);
-
-    overlay()?.classList.add('active');
+    el('checkoutOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 
-  // ── Close Modal ───────────────────────────────────────────
   function close() {
-    overlay()?.classList.remove('active');
+    el('checkoutOverlay') && el('checkoutOverlay').classList.remove('active');
     document.body.style.overflow = '';
   }
 
-  // ── Populate Step 1 ───────────────────────────────────────
-  function populateStep1() {
-    const pkg = currentPkg;
-
-    // Package summary card
-    setEl('coPkgName',     pkg.name);
-    setEl('coPkgDuration', pkg.duration + ' · ' + pkg.destination);
-    setEl('coPkgPrice',    formatINR(pkg.pricePerPerson));
-
-    const imgEl = document.getElementById('coPkgImg');
-    if (imgEl) {
-      imgEl.src = pkg.image;
-      imgEl.alt = pkg.name;
-    }
-
-    // Stepper value
-    updateStepperDisplay();
-
-    // Calculate total
-    updateTotal();
+  function computeTotals() {
+    var base = (currentPkg.pricePerPerson || 0) * travelers;
+    var gst = Math.round(base * GST_RATE);
+    var total = base + gst;
+    subtotalAmount = base;
+    gstAmount = gst;
+    totalWithGst = total;
   }
 
-  // ── Stepper ───────────────────────────────────────────────
-  function updateStepperDisplay() {
-    setEl('coTravelerCount', travelers);
-    updateTotal();
+  function populateStep1() {
+    computeTotals();
+    el('coPkgName').textContent = currentPkg.name;
+    el('coPkgDuration').textContent = currentPkg.duration + ' · ' + (currentPkg.destination || 'Northeast');
+    el('coPkgPrice').textContent = formatINR(currentPkg.pricePerPerson);
+    el('coPkgImg').src = currentPkg.image || '';
+    el('coTravelerCount').textContent = String(travelers);
+
+    el('coBreakPerPerson').textContent = formatINR(currentPkg.pricePerPerson);
+    el('coBreakTravelers').textContent = '× ' + travelers;
+    el('coBreakSubtotal').textContent = formatINR(subtotalAmount);
+    el('coBreakGst').textContent = formatINR(gstAmount);
+    el('coTotalAmount').textContent = formatINR(totalWithGst);
   }
 
   function updateTotal() {
-    const total = (currentPkg?.pricePerPerson || 0) * travelers;
-    setEl('coTotalAmount',   formatINR(total));
-    setEl('coTotalAmountS2', formatINR(total)); // Step 2 display
+    populateStep1();
   }
 
-  // ── Format INR ────────────────────────────────────────────
-  function formatINR(amount) {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency', currency: 'INR', maximumFractionDigits: 0,
-    }).format(amount);
-  }
-
-  // ── Step Navigation ───────────────────────────────────────
   function goToStep(n) {
     currentStep = n;
-
-    stepPanels().forEach(panel => {
-      const panelStep = parseInt(panel.dataset.step);
-      panel.classList.toggle('active', panelStep === n);
+    qAll('.co-panel').forEach(function (p) {
+      p.classList.toggle('active', parseInt(p.dataset.step, 10) === n);
     });
-
-    stepDots().forEach(dot => {
-      const dotStep = parseInt(dot.dataset.step);
-      dot.classList.remove('active', 'completed');
-      if (dotStep === n) dot.classList.add('active');
-      else if (dotStep < n) dot.classList.add('completed');
+    qAll('.co-step').forEach(function (s) {
+      var sNum = parseInt(s.dataset.step, 10);
+      s.classList.toggle('active', sNum === n);
+      s.classList.toggle('completed', sNum < n);
     });
-
     if (n === 2) populateStep2();
   }
 
-  // ── Populate Step 2 ───────────────────────────────────────
-  function populateStep2() {
-    const pkg   = currentPkg;
-    const total = (pkg?.pricePerPerson || 0) * travelers;
-
-    setEl('coRecapPkg',       pkg.name);
-    setEl('coRecapDest',      pkg.destination);
-    setEl('coRecapTravelers', `${travelers} traveler${travelers !== 1 ? 's' : ''}`);
-    setEl('coRecapMonth',     travelMonth || 'Flexible');
-    setEl('coRecapTotal',     formatINR(total));
-
-    const payBtn = document.getElementById('coPayBtn');
-    if (payBtn) payBtn.textContent = `Pay ${formatINR(total)}`;
+  function readGuestFromForm() {
+    guestName = (el('coGuestName') && el('coGuestName').value) ? el('coGuestName').value.trim() : '';
+    guestEmail = (el('coGuestEmail') && el('coGuestEmail').value) ? el('coGuestEmail').value.trim() : '';
+    guestPhone = (el('coGuestPhone') && el('coGuestPhone').value) ? el('coGuestPhone').value.trim() : '';
   }
 
-  // ── Trigger Razorpay ──────────────────────────────────────
-  function triggerPayment() {
-    const user  = window.AshtaAuth?.getUser();
-    const pkg   = currentPkg;
-    const total = (pkg?.pricePerPerson || 0) * travelers;
-    const ref   = 'ASHTA-' + Date.now().toString(36).toUpperCase();
+  function populateStep2() {
+    readGuestFromForm();
+    computeTotals();
+    el('coRecapSource').textContent = currentPkg.source === 'AI' ? 'AI-generated plan' : 'PREDEFINED package';
+    el('coRecapPkg').textContent = currentPkg.name;
+    el('coRecapDest').textContent = currentPkg.destination || 'Northeast';
+    el('coRecapGuest').textContent = guestName + ' · ' + guestEmail;
+    el('coRecapTravelers').textContent = String(travelers);
+    el('coRecapMonth').textContent = isAI() ? (travelDate || '—') : (travelMonth || 'TBD');
+    el('coRecapSub').textContent = formatINR(subtotalAmount);
+    el('coRecapGst').textContent = formatINR(gstAmount);
+    el('coRecapTotal').textContent = formatINR(totalWithGst);
+    el('coPayBtn').textContent = 'Proceed to payment (demo) — ' + formatINR(totalWithGst);
+  }
 
-    if (!window.AshtaPayment) {
-      console.error('[AshtaCheckout] AshtaPayment not loaded.');
+  function downloadConfirmation() {
+    var pkgName = el('coPkgName') && el('coPkgName').textContent ? el('coPkgName').textContent : 'Ashtadisha Journey';
+    var ref = el('coBookingId') && el('coBookingId').textContent ? el('coBookingId').textContent : 'Booking ref';
+    var when = el('coRecapMonth') && el('coRecapMonth').textContent ? el('coRecapMonth').textContent : 'TBD';
+    var total = el('coRecapTotal') && el('coRecapTotal').textContent ? el('coRecapTotal').textContent : 'N/A';
+    var text = [
+      'ASHTADISHA BOOKING CONFIRMATION',
+      '--------------------------------',
+      ref,
+      'Source: ' + (currentPkg.source === 'AI' ? 'AI' : 'PREDEFINED'),
+      'Guest: ' + guestName + ' | ' + guestEmail + ' | ' + guestPhone,
+      'Package: ' + pkgName,
+      'Travel: ' + when,
+      'Total (incl. GST): ' + total,
+      'Status: CONFIRMED',
+      '',
+      'Thank you for booking with Ashtadisha.'
+    ].join('\n');
+
+    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Ashtadisha_Booking_Confirmation.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function populateCheckmark() {
+    var container = el('coCheckAnimContainer');
+    if (container) {
+      container.innerHTML =
+        '<svg class="co-check-circle" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle class="check-circle-bg" cx="50" cy="50" r="44"/>' +
+        '<circle class="check-circle-ring" cx="50" cy="50" r="44" transform="rotate(-90 50 50)"/>' +
+        '<polyline class="check-mark" points="28,52 42,65 72,36"/>' +
+        '</svg>';
+    }
+  }
+
+  function formatINR(amt) {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amt);
+  }
+
+  function finalizeBooking(paymentId) {
+    computeTotals();
+    var itineraryPayload = buildStoredItinerary();
+
+    var fbUser = firebase.auth && firebase.auth().currentUser;
+    var bookingData = {
+      userId: fbUser && fbUser.uid,
+      packageName: currentPkg.name,
+      destination: currentPkg.destination,
+      travelers: travelers,
+      travelDate: isAI() ? travelDate : travelMonth,
+      totalAmount: totalWithGst,
+      paymentId: paymentId,
+      itineraryText: itineraryPayload,
+      status: 'CONFIRMED',
+      bookingSource: currentPkg.source === 'AI' ? 'AI' : 'PREDEFINED'
+    };
+
+    return window.AshtaFirebase && window.AshtaFirebase.createBooking
+      ? window.AshtaFirebase.createBooking(bookingData)
+      : Promise.resolve(null);
+  }
+
+  async function handlePayment() {
+    var btn = el('coPayBtn');
+    var originalText = btn.textContent;
+    var fbUser = firebase.auth && firebase.auth().currentUser;
+    if (!fbUser || !fbUser.uid) {
+      alert('Please sign in again to complete your booking.');
       return;
     }
 
-    window.AshtaPayment.openRazorpay({
-      amount:       total,
-      bookingRef:   ref,
-      packageName:  pkg.name,
-      prefillName:  user?.displayName || '',
-      prefillEmail: user?.email || '',
+    btn.disabled = true;
+    btn.textContent = 'Processing…';
 
-      onSuccess: async (rzpResponse) => {
-        lastPaymentId = rzpResponse.razorpay_payment_id;
-
-        // Save booking to Firebase
-        const bookingData = {
-          userId:       user?.uid || 'anonymous',
-          packageName:  pkg.name,
-          destination:  pkg.destination,
-          travelers,
-          travelDate:   travelMonth || 'TBD',
-          totalAmount:  total,
-          paymentId:    lastPaymentId,
-          bookingRef:   ref,
-          specialReqs,
-          status:       'confirmed',
-        };
-
-        const docId = await window.AshtaFirebase?.createBooking(bookingData);
-        lastBookingId = ref; // use ref as display ID
-
-        // Show confirmation step
-        goToStep(3);
-        populateStep3(ref);
-      },
-
-      onDismiss: () => {
-        // User closed Razorpay — stay on step 2
-        console.log('[AshtaCheckout] Payment dismissed, staying on step 2.');
-      },
+    await new Promise(function (resolve) {
+      setTimeout(resolve, 800);
     });
-  }
 
-  // ── Populate Step 3 (Confirmation) ────────────────────────
-  function populateStep3(bookingRef) {
-    setEl('coBookingId', 'Booking Ref: ' + bookingRef);
-    // Trigger CSS checkmark animation by re-inserting SVG
-    const checkEl = document.getElementById('coCheckAnimContainer');
-    if (checkEl) {
-      checkEl.innerHTML = `
-        <svg class="co-check-circle" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <circle class="check-circle-bg"  cx="50" cy="50" r="44"/>
-          <circle class="check-circle-ring" cx="50" cy="50" r="44" transform="rotate(-90 50 50)"/>
-          <polyline class="check-mark" points="28,52 42,65 72,36"/>
-        </svg>`;
+    var paymentId = 'MOCK-' + Date.now().toString(36).toUpperCase();
+
+    try {
+      var dbId = await finalizeBooking(paymentId);
+      var suffix = dbId != null ? String(dbId).slice(-6) : Date.now().toString().slice(-6);
+      el('coBookingId').textContent = 'Booking ref: ASHTA-' + suffix;
+      if (el('coConfirmStatus')) el('coConfirmStatus').textContent = 'CONFIRMED';
+      goToStep(3);
+      populateCheckmark();
+    } catch (err) {
+      console.error('[AshtaCheckout]', err);
+      alert('Could not save your booking. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
     }
   }
 
-  // ── Download Receipt ──────────────────────────────────────
-  function downloadReceipt() {
-    if (!currentPkg || !lastBookingId) return;
-
-    const user  = window.AshtaAuth?.getUser();
-    const total = (currentPkg.pricePerPerson || 0) * travelers;
-    const date  = new Date().toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' });
-
-    const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Ashtadisha Booking Confirmation</title>
-<style>
-  body { font-family: Georgia, serif; max-width: 720px; margin: 40px auto; color: #1E1E1E; padding: 20px; }
-  h1 { color: #1A3C2E; letter-spacing: 3px; font-size: 28px; }
-  .accent { color: #C8842A; }
-  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
-  td { padding: 10px 14px; border-bottom: 1px solid #EDE8E0; font-size: 14px; }
-  td:first-child { color: #6B5F52; width: 40%; }
-  .total-row td { font-weight: 700; font-size: 16px; color: #1A3C2E; border-top: 2px solid #1A3C2E; }
-  .footer { margin-top: 40px; font-size: 12px; color: #6B5F52; border-top: 1px solid #EDE8E0; padding-top: 16px; }
-  .ref { background: #F7F3EE; border: 1px solid #EDE8E0; padding: 12px 20px; font-size: 18px; font-style: italic; display: inline-block; margin: 12px 0; }
-</style>
-</head>
-<body>
-  <h1>ASHTADISHA</h1>
-  <p style="color:#6B5F52;margin-top:-8px;">Gateway to the Seven Sisters</p>
-  <h2 style="color:#1A3C2E;margin-top:24px;">Booking Confirmation</h2>
-  <div class="ref">${lastBookingId}</div>
-  <table>
-    <tr><td>Guest Name</td><td>${user?.fullName || '—'}</td></tr>
-    <tr><td>Email</td><td>${user?.primaryEmailAddress?.emailAddress || '—'}</td></tr>
-    <tr><td>Package</td><td>${currentPkg.name}</td></tr>
-    <tr><td>Destination</td><td>${currentPkg.destination}</td></tr>
-    <tr><td>Duration</td><td>${currentPkg.duration}</td></tr>
-    <tr><td>Travelers</td><td>${travelers}</td></tr>
-    <tr><td>Travel Month</td><td>${travelMonth || 'Flexible / TBD'}</td></tr>
-    <tr><td>Payment ID</td><td>${lastPaymentId || 'TEST-MODE'}</td></tr>
-    <tr><td>Booking Date</td><td>${date}</td></tr>
-    <tr class="total-row"><td>Amount Paid</td><td class="accent">${formatINR(total)}</td></tr>
-  </table>
-  <p>Our team will contact you within 24 hours to finalise your itinerary.</p>
-  <div class="footer">
-    Ashtadisha Tourism · contact@ashtadisha.in · +91-11-XXXX-XXXX<br>
-    GSTIN: XXXXXXXXXXXXXXXXX · All bookings subject to terms and conditions.
-  </div>
-</body>
-</html>`;
-
-    const blob = new Blob([html], { type: 'text/html' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `Ashtadisha-Booking-${lastBookingId}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-
-    // Also upload to Firebase Storage (best-effort)
-    if (window.AshtaFirebase?.uploadReceiptBlob && lastBookingId) {
-      window.AshtaFirebase.uploadReceiptBlob(blob, lastBookingId);
-    }
-  }
-
-  // ── Utility ───────────────────────────────────────────────
-  function setEl(id, text) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = text;
-  }
-
-  // ── Bind All Modal Events ─────────────────────────────────
   function bindEvents() {
-    // Close
-    document.getElementById('checkoutClose')?.addEventListener('click', close);
-    overlay()?.addEventListener('click', (e) => {
-      if (e.target === overlay()) close();
+    if (eventsBound || !el('checkoutOverlay')) return;
+    eventsBound = true;
+
+    el('checkoutClose') && el('checkoutClose').addEventListener('click', close);
+    el('checkoutOverlay') && el('checkoutOverlay').addEventListener('click', function (e) {
+      if (e.target === el('checkoutOverlay')) close();
     });
 
-    // Stepper
-    document.getElementById('coTravelerMinus')?.addEventListener('click', () => {
-      if (travelers > 1) { travelers--; updateStepperDisplay(); }
+    el('coTravelerMinus') && el('coTravelerMinus').addEventListener('click', function () {
+      if (travelers > 1) {
+        travelers--;
+        populateStep1();
+      }
     });
-    document.getElementById('coTravelerPlus')?.addEventListener('click', () => {
-      if (travelers < 20) { travelers++; updateStepperDisplay(); }
+    el('coTravelerPlus') && el('coTravelerPlus').addEventListener('click', function () {
+      if (travelers < 20) {
+        travelers++;
+        populateStep1();
+      }
     });
 
-    // Month picker
-    document.getElementById('coTravelMonth')?.addEventListener('change', (e) => {
+    el('coTravelMonth') && el('coTravelMonth').addEventListener('change', function (e) {
       travelMonth = e.target.value;
     });
-
-    // Special requests
-    document.getElementById('coSpecialReqs')?.addEventListener('input', (e) => {
+    el('coTravelDate') && el('coTravelDate').addEventListener('change', function (e) {
+      travelDate = e.target.value;
+    });
+    el('coSpecialReqs') && el('coSpecialReqs').addEventListener('input', function (e) {
       specialReqs = e.target.value;
     });
 
-    // Step navigation
-    document.getElementById('coNext1')?.addEventListener('click', () => goToStep(2));
-    document.getElementById('coBack2')?.addEventListener('click', () => goToStep(1));
+    el('coNext1') && el('coNext1').addEventListener('click', function () {
+      readGuestFromForm();
+      if (isAI() && !travelDate) {
+        alert('Please select a travel date before continuing.');
+        return;
+      }
+      if (!isAI() && !travelMonth) {
+        alert('Please select your preferred travel month.');
+        return;
+      }
+      if (!guestName || !guestEmail || !guestPhone) {
+        alert('Please enter your name, email, and phone number.');
+        return;
+      }
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail);
+      if (!emailOk) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+      goToStep(2);
+    });
 
-    // Pay button
-    document.getElementById('coPayBtn')?.addEventListener('click', triggerPayment);
+    el('coBack2') && el('coBack2').addEventListener('click', function () {
+      goToStep(1);
+    });
+    el('coPayBtn') && el('coPayBtn').addEventListener('click', handlePayment);
 
-    // Step 3 actions
-    document.getElementById('coViewTripsBtn')?.addEventListener('click', () => {
+    el('coViewTripsBtn') && el('coViewTripsBtn').addEventListener('click', function () {
       close();
-      window.location.href = 'dashboard.html';
+      window.location.href = '/dashboard.html';
     });
-    document.getElementById('coDownloadBtn')?.addEventListener('click', downloadReceipt);
+    el('coDownloadBtn') && el('coDownloadBtn').addEventListener('click', downloadConfirmation);
 
-    // Keyboard: Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && overlay()?.classList.contains('active')) close();
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && el('checkoutOverlay') && el('checkoutOverlay').classList.contains('active')) {
+        close();
+      }
     });
 
-    // "Book Now" buttons on package cards in existing booking section
-    document.querySelectorAll('[data-checkout-pkg]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.checkoutPkg;
-        open(key);
+    document.querySelectorAll('[data-checkout-pkg]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        open(btn.dataset.checkoutPkg);
       });
     });
   }
 
-  // ── Expose Public API ─────────────────────────────────────
-  window.AshtaCheckout = { open, close };
+  window.AshtaCheckout = { open: open, close: close };
 
-  // ── Init ─────────────────────────────────────────────────
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindEvents);
   } else {
     bindEvents();
   }
-
 })();

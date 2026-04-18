@@ -19,8 +19,22 @@
       userAvatarEl, userNameEl, dropdownMenu, userChip,
       passwordInput, passwordToggle, forgotBtn, nameFieldRow;
 
+  async function loadAuthMarkupIfNeeded() {
+    const el = document.getElementById('authOverlay');
+    if (!el || document.getElementById('authCard')) return;
+    try {
+      const r = await fetch('components/auth-inner.html');
+      if (!r.ok) return;
+      el.classList.add('auth-overlay');
+      el.innerHTML = await r.text();
+    } catch (e) {
+      console.warn('[AshtaAuth] Could not load auth-inner.html (planner / partial pages).', e);
+    }
+  }
+
   // ── Init ──────────────────────────────────────────────────
   async function init() {
+    await loadAuthMarkupIfNeeded();
     resolveDOM();
     bindEvents();
 
@@ -36,6 +50,14 @@
       });
     } else {
       console.error('[AshtaAuth] Firebase Auth SDK not found.');
+    }
+
+    const wantsLogin = new URLSearchParams(window.location.search).get('login') === '1';
+    const path = window.location.pathname.toLowerCase();
+    const onHomePage = path === '/' || path === '' || path.endsWith('/index.html');
+    const onPlannerPage = path.endsWith('planner.html');
+    if (wantsLogin && (onHomePage || onPlannerPage)) {
+      setTimeout(() => openAuthModal('signin'), 250);
     }
   }
 
@@ -97,10 +119,10 @@
     });
 
     document.getElementById('ddDashboard')?.addEventListener('click', () => {
-      window.location.href = 'dashboard.html';
+      window.location.href = '/dashboard.html';
     });
     document.getElementById('ddBookings')?.addEventListener('click', () => {
-      window.location.href = 'dashboard.html#my-trips';
+      window.location.href = '/dashboard.html#trips';
     });
     document.getElementById('ddSignOut')?.addEventListener('click', signOut);
 
@@ -108,6 +130,8 @@
     document.getElementById('navSignInBtn')?.addEventListener('click', () => openAuthModal('signin'));
     document.getElementById('mobileSignInBtn')?.addEventListener('click', () => {
       document.getElementById('mobileNavOverlay')?.classList.remove('open');
+      document.getElementById('hamburger')?.classList.remove('open');
+      document.body.style.overflow = '';
       openAuthModal('signin');
     });
 
@@ -232,10 +256,14 @@
         break;
       case 'auth/user-not-found':
       case 'auth/wrong-password':
-        msg = 'Invalid email or password.';
+      case 'auth/invalid-credential':
+        msg = 'Incorrect email or password. Please check and try again.';
         break;
       case 'auth/weak-password':
         msg = 'Password should be at least 6 characters.';
+        break;
+      case 'auth/operation-not-allowed':
+        msg = 'Email/Password disabled in Firebase! Go to Firebase Console -> Authentication -> Sign-in Method and enable "Email/Password".';
         break;
       default:
         msg = err.message;
@@ -349,7 +377,7 @@
     try {
       await firebase.auth().signOut();
       if (window.location.pathname.includes('dashboard')) {
-        window.location.href = 'index.html';
+        window.location.href = '/';
       }
     } catch (e) {
       console.error('[AshtaAuth] Sign out error:', e);

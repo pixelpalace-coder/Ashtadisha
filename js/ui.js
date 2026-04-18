@@ -53,23 +53,57 @@ export function initUI() {
     const mobileOverlay = document.getElementById('mobileNavOverlay');
     const mobileClose = document.getElementById('mobileNavClose');
 
+    function closeMobileNav() {
+        hamburger?.classList.remove('open');
+        mobileOverlay?.classList.remove('open');
+        if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    }
+
+    function openMobileNav() {
+        if (!mobileOverlay || !hamburger) return;
+        hamburger.classList.add('open');
+        mobileOverlay.classList.add('open');
+        hamburger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+    }
+
     if (hamburger && mobileOverlay) {
         hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('open');
-            mobileOverlay.classList.toggle('open');
-            hamburger.setAttribute('aria-expanded', hamburger.classList.contains('open'));
+            const opening = !mobileOverlay.classList.contains('open');
+            if (opening) openMobileNav();
+            else closeMobileNav();
         });
-        if (mobileClose) mobileClose.addEventListener('click', () => {
-            hamburger.classList.remove('open');
-            mobileOverlay.classList.remove('open');
+        if (mobileClose) mobileClose.addEventListener('click', closeMobileNav);
+        // Tap dimmed backdrop (overlay itself) to close — fixes “stuck” feeling
+        mobileOverlay.addEventListener('click', (e) => {
+            if (e.target === mobileOverlay) closeMobileNav();
         });
         mobileOverlay.querySelectorAll('.mobile-nav-link').forEach(link => {
             link.addEventListener('click', () => {
-                hamburger.classList.remove('open');
-                mobileOverlay.classList.remove('open');
+                closeMobileNav();
             });
         });
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            if (mobileOverlay.classList.contains('open')) {
+                closeMobileNav();
+                e.preventDefault();
+            }
+        });
     }
+
+    // Mobile quick bar (homepage): Home / Packages / Book / Menu
+    const mqnMenuBtn = document.getElementById('mqnOpenMenu');
+    if (mqnMenuBtn && hamburger && mobileOverlay) {
+        mqnMenuBtn.addEventListener('click', () => {
+            if (!mobileOverlay.classList.contains('open')) openMobileNav();
+            else closeMobileNav();
+        });
+    }
+    document.querySelectorAll('.mqn-link[href^="#"]').forEach((link) => {
+        link.addEventListener('click', () => closeMobileNav());
+    });
 
     const themeBtn = document.getElementById('theme-toggle');
     const htmlEl = document.documentElement;
@@ -99,10 +133,16 @@ export function initUI() {
         let dotX = mouseX, dotY = mouseY, ringX = mouseX, ringY = mouseY;
         let rAF_flag = false;
 
+        let isCursorRendering = false;
+
         window.addEventListener('mousemove', (e) => { 
             if (!rAF_flag) {
                 requestAnimationFrame(() => {
                     mouseX = e.clientX; mouseY = e.clientY; 
+                    if (!isCursorRendering) {
+                        isCursorRendering = true;
+                        renderCursor();
+                    }
                     rAF_flag = false;
                 });
                 rAF_flag = true;
@@ -110,15 +150,27 @@ export function initUI() {
         }, { passive: true });
 
         const renderCursor = () => {
-            dotX += (mouseX - dotX) * 0.4;
-            dotY += (mouseY - dotY) * 0.4;
-            ringX += (mouseX - ringX) * 0.1;
-            ringY += (mouseY - ringY) * 0.1;
+            const dx = mouseX - dotX;
+            const dy = mouseY - dotY;
+            const rx = mouseX - ringX;
+            const ry = mouseY - ringY;
+
+            dotX += dx * 0.4;
+            dotY += dy * 0.4;
+            ringX += rx * 0.1;
+            ringY += ry * 0.1;
+
             cursorDot.style.transform = `translate3d(${dotX}px, ${dotY}px, 0)`;
             cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
-            requestAnimationFrame(renderCursor);
+
+            if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1 || Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1) {
+                requestAnimationFrame(renderCursor);
+            } else {
+                isCursorRendering = false;
+            }
         };
-        requestAnimationFrame(renderCursor);
+        isCursorRendering = true;
+        renderCursor();
 
         const bindHovers = () => {
             document.querySelectorAll('a,button,input,select,label,.thumb, .shop-card, .pkg-card').forEach(el => {

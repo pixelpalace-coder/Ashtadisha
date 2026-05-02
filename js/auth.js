@@ -282,11 +282,13 @@
       window.AshtaFirebase.saveUser(user);
     }
 
-    // Resume pending booking
+    // Resume pending booking by routing to booking section.
     if (window._pendingCheckoutData) {
-      const data = window._pendingCheckoutData;
       window._pendingCheckoutData = null;
-      setTimeout(() => window.AshtaCheckout?.open(data), 500);
+      setTimeout(() => {
+        const booking = document.getElementById('booking');
+        booking?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 500);
     }
   }
 

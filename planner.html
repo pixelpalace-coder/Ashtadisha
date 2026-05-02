@@ -1,569 +1,110 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>AI Travel Planner — Ashtadisha | Northeast India</title>
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <meta name="description"
-    content="Plan your perfect Northeast India trip with Priya — Ashtadisha's AI travel curator. Day-by-day itineraries for Assam, Meghalaya, Arunachal, Nagaland and all 7 Sisters.">
-  <meta name="robots" content="index, follow">
-  <meta property="og:title" content="AI Travel Planner — Ashtadisha">
-  <meta property="og:description"
-    content="Get a personalised Northeast India itinerary in seconds. Real places, real prices, real experiences.">
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Hind:wght@400;500;600&display=swap"
-    rel="stylesheet">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/planner-page.css">
-
-  <!-- Firebase (for auth state) -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Trip Planner | Ashtadisha</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/planner-page.css" />
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-  <!-- Animation libs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
 </head>
-
 <body>
-
-  <!-- Custom Cursor -->
-  <div class="custom-cursor">
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
-  </div>
-
-  <!-- ── NAVBAR ── -->
-  <nav class="main-nav" id="mainNav">
-    <div class="nav-container">
-      <a href="/" class="logo" aria-label="Ashtadisha Home">
-        <svg class="logo-compass" viewBox="0 0 40 40" fill="none" width="28" height="28">
-          <path d="M20 0L22.8 15.2L38 20L22.8 24.8L20 40L17.2 24.8L2 20L17.2 15.2L20 0Z" fill="currentColor"
-            opacity="0.9" />
-          <circle cx="20" cy="20" r="3" fill="var(--color-accent)" />
-        </svg>
-        <span class="logo-text-wrap">ASHTADISHA</span>
-      </a>
-      <div class="nav-links planner-nav-links">
-        <a href="/" class="nav-link">Home <span class="nav-hi">होम</span></a>
-        <a href="#planner-book-tour" class="nav-link">Book Tour <span class="nav-hi">बुक टूर</span></a>
-        <div class="nav-auth-pre" id="navAuthPre">
-          <button class="nav-signin-btn" id="navSignInBtn">Sign In</button>
-        </div>
-        <div class="nav-auth-post hidden" id="navAuthPost">
-          <a href="/dashboard.html" class="nav-mytrips-link">My Trips</a>
-          <div class="nav-user-chip" id="navUserChip" role="button" aria-expanded="false" aria-haspopup="true">
-            <div class="nav-avatar" id="navUserAvatar">T</div>
-            <span class="nav-user-name" id="navUserName">Traveler</span>
-            <span class="nav-avatar-arrow">▾</span>
+  <main class="planner-page">
+    <div class="planner-shell">
+      <header class="planner-hero card-glass">
+        <a href="/" class="planner-back-link">← Back to Home</a>
+        <div class="planner-hero__grid">
+          <div class="planner-hero__copy">
+            <p class="planner-badge">GPT‑powered · Northeast India</p>
+            <h1>AI Trip Planner</h1>
+            <p class="planner-hero__lead">
+              Describe budget, duration, and passions—we return day‑by‑day routes, realistic INR costs,
+              permits‑aware tips, and highlights you can book straight through Stripe on the main site.
+            </p>
           </div>
-          <div class="nav-user-dropdown" id="navUserDropdown" role="menu">
-            <button class="nav-dropdown-item" id="ddDashboard" type="button" role="menuitem">My Dashboard</button>
-            <button class="nav-dropdown-item" id="ddBookings" type="button" role="menuitem">My Bookings</button>
-            <button class="nav-dropdown-item signout" id="ddSignOut" type="button" role="menuitem">Sign Out</button>
-          </div>
+          <ul class="planner-stats" aria-label="Planner highlights">
+            <li><strong>8</strong><span>states &amp; tribal belts</span></li>
+            <li><strong>INR</strong><span>budget-aware estimates</span></li>
+            <li><strong>Live</strong><span>day slots &amp; costs</span></li>
+          </ul>
         </div>
-      </div>
-      <!-- Hamburger -->
-      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- Mobile Nav Overlay -->
-  <div class="mobile-nav-overlay" id="mobileNavOverlay">
-    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
-    <div class="mobile-nav-links">
-      <a href="/" class="mobile-nav-link">Home / होम</a>
-      <a href="#planner-book-tour" class="mobile-nav-link">Book Tour / बुक टूर</a>
-      <a href="/" class="mobile-nav-link">← Main site / मुख्य साइट</a>
-      <button class="mobile-nav-link" id="mobileSignInBtn"
-        style="background:none;border:none;color:rgba(255,255,255,0.9);font-family:var(--font-display);font-size:2rem;font-weight:700;">
-        Sign In / साइन इन
-      </button>
-    </div>
-  </div>
-
-
-  <!-- ── HERO ── -->
-  <section class="planner-hero">
-    <div class="planner-hero-bg">
-      <!-- Layered state images rotate in background -->
-      <div class="hero-slide active"
-        style="background-image:url('https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1600&q=80')">
-      </div>
-      <div class="hero-slide"
-        style="background-image:url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1600&q=80')">
-      </div>
-      <div class="hero-slide"
-        style="background-image:url('https://images.unsplash.com/photo-1564760055775-d63b17a55c44?auto=format&fit=crop&w=1600&q=80')">
-      </div>
-      <div class="hero-bg-overlay"></div>
-    </div>
-    <div class="planner-hero-content">
-      <div class="priya-orb">🧭</div>
-      <h1>Plan Your Northeast India Journey</h1>
-      <p class="hero-hi">अपनी पूर्वोत्तर यात्रा यहाँ से शुरू करें</p>
-      <p class="hero-sub">Tell Priya — our AI travel curator — your preferences.<br>Get a day-by-day itinerary with real
-        hotels, authentic food & honest pricing.</p>
-      <div class="hero-trust-chips">
-        <span>📅 Day-by-day schedule</span>
-        <span>🏨 Real hotel names</span>
-        <span>🍛 Authentic dishes</span>
-        <span>💰 Honest pricing</span>
-        <span>🌤 Seasonal tips</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── SHOWCASE STRIP ── -->
-  <section class="state-strip">
-    <div class="strip-inner">
-      <div class="strip-card" data-state="Assam">
-        <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=400&q=75"
-          alt="Kaziranga, Assam" loading="lazy">
-        <span>Assam 🌿</span>
-      </div>
-      <div class="strip-card" data-state="Meghalaya">
-        <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=400&q=75"
-          alt="Root Bridge, Meghalaya" loading="lazy">
-        <span>Meghalaya 🌧</span>
-      </div>
-      <div class="strip-card" data-state="Arunachal Pradesh">
-        <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=400&q=75"
-          alt="Ziro Valley, Arunachal" loading="lazy">
-        <span>Arunachal ❄️</span>
-      </div>
-      <div class="strip-card" data-state="Nagaland">
-        <img src="https://images.unsplash.com/photo-1604928141064-207cea6f571f?auto=format&fit=crop&w=400&q=75"
-          alt="Hornbill Festival, Nagaland" loading="lazy">
-        <span>Nagaland 🥁</span>
-      </div>
-      <div class="strip-card" data-state="Manipur">
-        <img src="https://images.unsplash.com/photo-1526397751294-331021109fbd?auto=format&fit=crop&w=400&q=75"
-          alt="Loktak Lake, Manipur" loading="lazy">
-        <span>Manipur 💃</span>
-      </div>
-      <div class="strip-card" data-state="Mizoram">
-        <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=75"
-          alt="Mizoram Hills" loading="lazy">
-        <span>Mizoram 🏔</span>
-      </div>
-      <div class="strip-card" data-state="Tripura">
-        <img src="https://images.unsplash.com/photo-1543158181-e6f9f6712055?auto=format&fit=crop&w=400&q=75"
-          alt="Neermahal, Tripura" loading="lazy">
-        <span>Tripura 🏛</span>
-      </div>
-      <div class="strip-card" data-state="Sikkim">
-        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=400&q=75"
-          alt="Kangchenjunga, Sikkim" loading="lazy">
-        <span>Sikkim 🏯</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── MAIN PLANNER ── -->
-  <section class="planner-main">
-    <div class="planner-container">
-
-      <!-- LEFT — FORM -->
-      <div class="planner-form-panel" id="plannerFormPanel">
-        <div class="form-panel-header">
-          <div class="priya-badge-lg">
-            <span class="priya-glow-icon">🧭</span>
-            <div>
-              <strong>Priya</strong>
-              <span>AI Northeast India Curator</span>
-            </div>
-          </div>
-          <p class="form-panel-desc">Fill in your preferences below and get a complete, realistic itinerary in seconds.
-          </p>
-        </div>
-
-        <!-- States -->
-        <div class="pf-field">
-          <label class="pf-label">Select States <span class="pf-hi">/ कौन से राज्य?</span></label>
-          <div class="pill-select" id="stateSelect">
-            <button class="pill" data-val="Assam">🌿 Assam</button>
-            <button class="pill" data-val="Meghalaya">🌧 Meghalaya</button>
-            <button class="pill" data-val="Nagaland">🥁 Nagaland</button>
-            <button class="pill" data-val="Manipur">💃 Manipur</button>
-            <button class="pill" data-val="Mizoram">🏔 Mizoram</button>
-            <button class="pill" data-val="Tripura">🏛 Tripura</button>
-            <button class="pill" data-val="Arunachal Pradesh">❄️ Arunachal</button>
-            <button class="pill" data-val="Sikkim">🏯 Sikkim</button>
-          </div>
-        </div>
-
-        <!-- Duration -->
-        <div class="pf-field">
-          <label class="pf-label">
-            Duration: <span class="days-display" id="daysVal">7</span> Days
-            <span class="pf-hi">/ कितने दिन?</span>
-          </label>
-          <div class="slider-row">
-            <span class="slider-lab">3</span>
-            <input type="range" id="daysSlider" min="3" max="21" value="7" class="pf-slider">
-            <span class="slider-lab">21</span>
-          </div>
-        </div>
-
-        <!-- Style -->
-        <div class="pf-field">
-          <label class="pf-label">Travel Style <span class="pf-hi">/ यात्रा शैली</span></label>
-          <div class="pill-select" id="styleSelect">
-            <button class="pill" data-val="Adventure">🏔 Adventure</button>
-            <button class="pill selected" data-val="Culture">🎭 Culture</button>
-            <button class="pill" data-val="Nature">🌿 Nature</button>
-            <button class="pill" data-val="Luxury">✨ Luxury</button>
-            <button class="pill" data-val="Budget">💰 Budget</button>
-            <button class="pill" data-val="Spiritual">🕉 Spiritual</button>
-          </div>
-        </div>
-
-        <!-- Month + Group row -->
-        <div class="pf-row-2">
-          <div class="pf-field">
-            <label class="pf-label">Month <span class="pf-hi">/ महीना</span></label>
-            <select class="pf-select" id="monthSelect">
-              <option>January</option>
-              <option>February</option>
-              <option>March</option>
-              <option>April</option>
-              <option>May</option>
-              <option>June</option>
-              <option>July</option>
-              <option>August</option>
-              <option>September</option>
-              <option selected>October</option>
-              <option>November</option>
-              <option>December</option>
-            </select>
-          </div>
-          <div class="pf-field">
-            <label class="pf-label">Group Type <span class="pf-hi">/ किसके साथ</span></label>
-            <div class="pill-select" id="groupSelect">
-              <button class="pill" data-val="Solo">🙋 Solo</button>
-              <button class="pill selected" data-val="Couple">💑 Couple</button>
-              <button class="pill" data-val="Family">👨‍👩‍👧 Family</button>
-              <button class="pill" data-val="Friends">👥 Friends</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Interests -->
-        <div class="pf-field">
-          <label class="pf-label">Interests <span class="pf-hi">/ रुचियाँ</span></label>
-          <div class="pill-select" id="interestSelect">
-            <button class="pill" data-val="Trekking">🥾 Trekking</button>
-            <button class="pill" data-val="Wildlife">🦏 Wildlife</button>
-            <button class="pill" data-val="Festivals">🎊 Festivals</button>
-            <button class="pill" data-val="Monasteries">🏯 Monasteries</button>
-            <button class="pill" data-val="Tribal Culture">🪃 Tribal Culture</button>
-            <button class="pill" data-val="Tea Gardens">🍃 Tea Gardens</button>
-            <button class="pill" data-val="Photography">📸 Photography</button>
-            <button class="pill" data-val="River Sports">🚣 River Sports</button>
-          </div>
-        </div>
-
-        <!-- Budget -->
-        <div class="pf-field">
-          <label class="pf-label">Budget Range <span class="pf-hi">/ बजट</span></label>
-          <div class="pill-select" id="budgetSelect">
-            <button class="pill" data-val="Budget">💰 Budget (₹8k–18k)</button>
-            <button class="pill selected" data-val="Mid-Range">✈ Mid-Range (₹20k–45k)</button>
-            <button class="pill" data-val="Luxury">✨ Luxury (₹55k+)</button>
-          </div>
-        </div>
-
-        <!-- Diet -->
-        <div class="pf-field">
-          <label class="pf-label">Diet <span class="pf-hi">/ भोजन</span></label>
-          <div class="pill-select" id="dietSelect">
-            <button class="pill" data-val="Vegetarian">🥦 Veg</button>
-            <button class="pill selected" data-val="Non-Vegetarian">🍗 Non-Veg</button>
-            <button class="pill" data-val="Vegan">🌱 Vegan</button>
-            <button class="pill" data-val="Jain">🙏 Jain</button>
-          </div>
-        </div>
-
-        <button class="generate-btn" id="generateBtn">
-          <span class="btn-shimmer"></span>
-          ✦ Generate My Itinerary
-          <small>मेरी यात्रा बनाएँ</small>
-        </button>
-      </div>
-
-      <!-- RIGHT — OUTPUT -->
-      <div class="planner-output-panel" id="plannerOutput">
-
-        <!-- Placeholder -->
-        <div class="output-placeholder" id="outputPlaceholder">
-          <div class="placeholder-compass">🧭</div>
-          <h2>Meet Priya</h2>
-          <p class="placeholder-hi">आपकी AI यात्रा विशेषज्ञ</p>
-          <p>Select your states, travel style and budget on the left, then hit <strong>Generate</strong> to get your
-            personalised itinerary.</p>
-          <div class="placeholder-chips">
-            <span>📅 Day-by-day schedule</span>
-            <span>🏨 Real hotel names</span>
-            <span>🍛 Local dishes</span>
-            <span>💰 Daily cost estimate</span>
-          </div>
-
-          <!-- Sample state cards to make page look full -->
-          <div class="sample-previews">
-            <div class="sample-card">
-              <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=75"
-                alt="Kaziranga">
-              <div class="sample-card-body">
-                <strong>Assam · 3 Days</strong>
-                <p>Kaziranga safari, Kamakhya temple, Brahmaputra cruise</p>
-                <span class="sample-price">From ₹8,500 / person</span>
-              </div>
-            </div>
-            <div class="sample-card">
-              <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=600&q=75"
-                alt="Root Bridge Meghalaya">
-              <div class="sample-card-body">
-                <strong>Meghalaya · 4 Days</strong>
-                <p>Living Root Bridge, Dawki river, Mawlynnong village</p>
-                <span class="sample-price">From ₹10,200 / person</span>
-              </div>
-            </div>
-            <div class="sample-card">
-              <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=600&q=75"
-                alt="Ziro Valley">
-              <div class="sample-card-body">
-                <strong>Arunachal · 5 Days</strong>
-                <p>Tawang monastery, Sela Pass, Ziro Valley, Mechuka</p>
-                <span class="sample-price">From ₹14,000 / person</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Loading -->
-        <div class="output-loading" id="outputLoading" style="display:none;">
-          <div class="loading-orb">🧭</div>
-          <div class="loading-dots"><span></span><span></span><span></span></div>
-          <p>Priya is crafting your itinerary… <span class="hi-text">प्रिया आपकी यात्रा बना रही है…</span></p>
-        </div>
-
-        <!-- Generated content -->
-        <div class="output-result" id="outputContent" style="display:none;"></div>
-
-        <!-- Actions -->
-        <div class="output-actions" id="outputActions" style="display:none;">
-          <button class="action-btn save" id="saveBtn">💾 Save as PDF</button>
-          <button class="action-btn book" id="bookFromPlan">📋 Book This Plan</button>
-          <button class="action-btn regen" id="regenBtn">🔄 Regenerate</button>
-        </div>
-
-        <!-- Chat -->
-        <div class="chat-section" id="followupChat" style="display:none;">
-          <div class="chat-history" id="chatHistory"></div>
-          <div class="chat-input-row">
-            <input type="text" id="chatInput"
-              placeholder="Ask Priya anything… e.g. 'Is Arunachal safe for solo women?' / कुछ भी पूछें…">
-            <button class="chat-send" id="chatSendBtn">→</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Book predefined packages (checkout modal lives on this page) ── -->
-  <section id="planner-book-tour" class="popular-packages-section planner-packages-section" data-aos="fade-up">
-    <div class="container">
-      <header class="popular-packages-header">
-        <h2 class="section-title">Popular Packages</h2>
-        <p class="section-desc popular-packages-lead">
-          Fixed Northeast circuits — same secure checkout as <strong>Book This Plan</strong> above.
-        </p>
       </header>
-      <div class="popular-packages-grid" id="popularPackagesGridPlanner" aria-live="polite"></div>
-    </div>
-  </section>
 
-  <!-- ── PRICING REFERENCE SECTION ── -->
-  <section class="pricing-ref-section">
-    <div class="container">
-      <h2 class="section-title">Realistic NE India Trip Costs</h2>
-      <p class="section-desc">All prices are 2025 estimates per person including stay, meals & local transport. Flights
-        extra.</p>
-      <div class="pricing-cards">
-        <div class="price-card">
-          <div class="price-card-top budget">
-            <span class="price-tag-emoji">🎒</span>
-            <h3>Budget</h3>
-            <p>Guesthouses, local dhabas, shared transport</p>
-          </div>
-          <ul class="price-list">
-            <li><span>Accommodation (per night)</span><strong>₹400–900</strong></li>
-            <li><span>Meals (3 per day)</span><strong>₹300–600</strong></li>
-            <li><span>Local transport</span><strong>₹300–700/day</strong></li>
-            <li><span>Safaris / Activities</span><strong>₹500–1,500</strong></li>
-          </ul>
-          <div class="price-card-total">
-            <span>7-day trip total</span>
-            <strong>₹8,500–18,000</strong>
-            <small>per person</small>
-          </div>
+      <section class="planner-how card-glass" aria-labelledby="how-heading">
+        <h2 id="how-heading">How it works</h2>
+        <ol class="planner-how__steps">
+          <li><span>①</span> Lock destination + rough INR budget</li>
+          <li><span>②</span> Pick vibes—culture, trek, food, family &amp; more</li>
+          <li><span>③</span> Generate—review timeline, tips, then book with Stripe</li>
+        </ol>
+      </section>
+
+      <form id="plannerForm" class="planner-form card-glass">
+        <div class="planner-form-section-title">Trip inputs</div>
+        <div class="planner-form-grid">
+          <label>Destination
+            <select id="planDestination" required>
+              <option value="Assam">Assam</option>
+              <option value="Meghalaya">Meghalaya</option>
+              <option value="Nagaland">Nagaland</option>
+              <option value="Manipur">Manipur</option>
+              <option value="Mizoram">Mizoram</option>
+              <option value="Tripura">Tripura</option>
+              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+              <option value="Sikkim">Sikkim</option>
+            </select>
+          </label>
+          <label>Budget (INR)<input id="planBudget" type="number" min="5000" step="500" placeholder="35000" required /></label>
+          <label>Duration (days)<input id="planDuration" type="number" min="1" max="20" placeholder="5" required /></label>
         </div>
-        <div class="price-card featured">
-          <div class="price-card-badge">Most Popular</div>
-          <div class="price-card-top mid">
-            <span class="price-tag-emoji">✈</span>
-            <h3>Mid-Range</h3>
-            <p>3-star hotels, guided tours, private SUV</p>
-          </div>
-          <ul class="price-list">
-            <li><span>Accommodation (per night)</span><strong>₹1,500–3,500</strong></li>
-            <li><span>Meals (3 per day, restaurants)</span><strong>₹800–1,800</strong></li>
-            <li><span>Private SUV transport</span><strong>₹1,200–2,500/day</strong></li>
-            <li><span>Safaris / Activities</span><strong>₹1,000–3,500</strong></li>
-          </ul>
-          <div class="price-card-total">
-            <span>7-day trip total</span>
-            <strong>₹22,000–42,000</strong>
-            <small>per person</small>
-          </div>
+
+        <div class="planner-presets" aria-label="Quick budget presets">
+          <span class="planner-presets__label">Quick presets</span>
+          <button type="button" class="planner-chip" data-budget="25000" data-days="4">Weekend · ₹25k · 4d</button>
+          <button type="button" class="planner-chip" data-budget="55000" data-days="7">Week · ₹55k · 7d</button>
+          <button type="button" class="planner-chip" data-budget="95000" data-days="10">Deep dive · ₹95k · 10d</button>
         </div>
-        <div class="price-card">
-          <div class="price-card-top luxury">
-            <span class="price-tag-emoji">✨</span>
-            <h3>Luxury</h3>
-            <p>Heritage stays, private guides, curated experiences</p>
-          </div>
-          <ul class="price-list">
-            <li><span>Accommodation (per night)</span><strong>₹5,000–18,000</strong></li>
-            <li><span>Meals (gourmet / resort)</span><strong>₹2,500–5,000</strong></li>
-            <li><span>Private SUV + guide</span><strong>₹3,500–7,000/day</strong></li>
-            <li><span>Exclusive activities</span><strong>₹3,000–10,000</strong></li>
-          </ul>
-          <div class="price-card-total">
-            <span>7-day trip total</span>
-            <strong>₹55,000–1,20,000</strong>
-            <small>per person</small>
-          </div>
+
+        <div class="planner-form-section-title">Interests</div>
+        <div class="planner-prefs">
+          <label class="planner-pref"><input type="checkbox" name="preference" value="adventure" /> Adventure &amp; trek</label>
+          <label class="planner-pref"><input type="checkbox" name="preference" value="food" /> Food &amp; markets</label>
+          <label class="planner-pref"><input type="checkbox" name="preference" value="nature" /> Nature &amp; wildlife</label>
+          <label class="planner-pref"><input type="checkbox" name="preference" value="culture" /> Culture &amp; tribes</label>
+          <label class="planner-pref"><input type="checkbox" name="preference" value="photography" /> Landscapes / photo</label>
+          <label class="planner-pref"><input type="checkbox" name="preference" value="family" /> Family friendly</label>
         </div>
+
+        <div class="planner-form-actions">
+          <button class="btn btn-primary planner-generate-btn" type="submit">Generate itinerary</button>
+          <p class="planner-form-note">Requires sign‑in. Uses OpenAI via secure Firebase Functions.</p>
+        </div>
+      </form>
+
+      <section id="plannerOutput" class="card-glass planner-output-shell" aria-live="polite"></section>
+
+      <div class="planner-footer-actions">
+        <button id="savePlanBtn" class="btn btn-outline" type="button" disabled title="Plans are saved automatically when generated">Saved to account</button>
+        <button id="bookPlanBtn" class="btn btn-primary" type="button" disabled>Book with Stripe →</button>
       </div>
-      <p class="pricing-footnote">* Flights from major metros (Delhi/Mumbai) to Guwahati/Bagdogra: ₹3,500–12,000
-        one-way. Inner Line Permits for Arunachal: ₹100–200. All prices exclude peak festival season surcharges.</p>
     </div>
-  </section>
+  </main>
 
-  <div class="auth-overlay" id="authOverlay" role="dialog" aria-modal="true" aria-label="Sign in or create account"></div>
-  <div id="checkout-placeholder"></div>
-
-  <!-- Footer placeholder -->
-  <div id="footer-placeholder"></div>
-
-  <!-- Theme toggle -->
-  <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
-    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    </svg>
-  </button>
-
-  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
-  <script src="js/firebase.js" defer></script>
-  <script src="js/booking-package.js" defer></script>
-  <script src="data/packages.js" defer></script>
-  <script src="js/auth.js" defer></script>
-  <script src="js/payment.js" defer></script>
-  <script src="js/booking-checkout.js" defer></script>
-
+  <div class="auth-overlay" id="authOverlay"></div>
+  <script src="js/app-config.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/auth.js"></script>
   <script type="module">
-    import { initPlanner } from './js/planner.js';
     import { initUI } from './js/ui.js';
-    import { initPopularPackages } from './js/popular-packages.js';
-
-    document.addEventListener('DOMContentLoaded', () => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initUI);
+    } else {
       initUI();
-      initPlanner();
-      initPopularPackages({ gridId: 'popularPackagesGridPlanner' });
-
-      const navAuthPre = document.getElementById('navAuthPre');
-      const navAuthPost = document.getElementById('navAuthPost');
-      const navUserName = document.getElementById('navUserName');
-      const navUserAvatar = document.getElementById('navUserAvatar');
-
-      if (window.firebase?.auth) {
-        firebase.auth().onAuthStateChanged((user) => {
-          if (user) {
-            navAuthPre?.classList.add('hidden');
-            navAuthPost?.classList.remove('hidden');
-            const name = user.displayName || user.email?.split('@')[0] || 'Traveler';
-            if (navUserName) navUserName.textContent = name;
-            if (navUserAvatar) navUserAvatar.textContent = name[0].toUpperCase();
-          } else {
-            navAuthPost?.classList.add('hidden');
-            navAuthPre?.classList.remove('hidden');
-          }
-        });
-      }
-
-      // Load footer
-      fetch('components/footer.html')
-        .then(r => r.text())
-        .then(html => { document.getElementById('footer-placeholder').innerHTML = html; });
-
-      fetch('components/checkout.html')
-        .then(r => r.text())
-        .then((html) => {
-          document.getElementById('checkout-placeholder').innerHTML = html;
-        })
-        .catch(() => {});
-
-      // Strip card selects state pill
-      document.querySelectorAll('.strip-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const state = card.dataset.state;
-          const pill = document.querySelector(`#stateSelect .pill[data-val="${state}"]`);
-          if (pill) {
-            pill.classList.toggle('selected');
-            card.classList.toggle('strip-active');
-          }
-        });
-      });
-
-      // Hero slideshow
-      const slides = document.querySelectorAll('.hero-slide');
-      let current = 0;
-      setInterval(() => {
-        slides[current].classList.remove('active');
-        current = (current + 1) % slides.length;
-        slides[current].classList.add('active');
-      }, 5000);
-    });
+    }
   </script>
+  <script src="js/planner.js"></script>
 </body>
-
 </html>

@@ -35,16 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Load Components into the DOM
     await loader.loadAll();
 
-    const checkoutMount = document.getElementById('checkoutMount');
-    if (checkoutMount) {
-        try {
-            const res = await fetch('components/checkout.html');
-            if (res.ok) checkoutMount.innerHTML = await res.text();
-        } catch (e) {
-            console.error('[main] Checkout inject failed', e);
-        }
-    }
-
     // Do not bulk-preload every image — that caused long freezes and scroll jank.
     // Hero/above-fold assets stay in HTML; other images use lazy loading in markup where possible.
 

@@ -1,6 +1,6 @@
 /**
  * Central predefined travel packages for Ashtadisha booking.
- * Loaded before checkout; merged into catalog by booking-checkout.js
+ * Merged into the catalog by js/firebase.js when Firestore has no packages.
  */
 (function () {
   'use strict';

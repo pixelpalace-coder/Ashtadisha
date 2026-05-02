@@ -21,6 +21,11 @@ styles.css.old
 node_modules/
 npm-debug.log*
 
+# Firebase Functions local secrets
+functions/.env
+.env
+.env.*
+
 # Python
 __pycache__/
 *.py[cod]

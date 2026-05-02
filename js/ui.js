@@ -124,9 +124,18 @@ export function initUI() {
     }
 
     // 3. Custom Cursor
-    const cursorDot = document.querySelector('.cursor-dot');
-    const cursorRing = document.querySelector('.cursor-ring');
-    const cursorWrapper = document.querySelector('.custom-cursor');
+    let cursorWrapper = document.querySelector('.custom-cursor');
+    let cursorDot = document.querySelector('.cursor-dot');
+    let cursorRing = document.querySelector('.cursor-ring');
+
+    if (!cursorWrapper && window.matchMedia('(pointer: fine)').matches) {
+        cursorWrapper = document.createElement('div');
+        cursorWrapper.className = 'custom-cursor';
+        cursorWrapper.innerHTML = '<div class="cursor-dot"></div><div class="cursor-ring"></div>';
+        document.body.appendChild(cursorWrapper);
+        cursorDot = cursorWrapper.querySelector('.cursor-dot');
+        cursorRing = cursorWrapper.querySelector('.cursor-ring');
+    }
 
     if (window.matchMedia('(pointer: fine)').matches && cursorDot && cursorRing) {
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;

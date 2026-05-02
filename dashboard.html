@@ -37,7 +37,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
   <script>
     // Prevent Flash of Unstyled Content (FOUC)
     const savedTheme = localStorage.getItem('ashtadisha_theme') || 'light';
@@ -114,7 +114,7 @@
       <div class="db-stats-grid">
         <div class="db-stat-card">
           <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div class="stat-info"><h3>Upcoming</h3><p id="statUpcoming">0 Trips</p></div>
+          <div class="stat-info"><h3>Confirmed</h3><p id="statUpcoming">0 trips</p></div>
         </div>
         <div class="db-stat-card">
           <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -186,9 +186,6 @@
     </section>
   </main>
 
-  <!-- Checkout modal is injected from components/checkout.html -->
-  <div id="checkoutMount"></div>
-
   <!-- ═══ Itinerary Detail Modal ═══ -->
   <div class="checkout-overlay" id="itineraryOverlay">
     <div class="checkout-modal" style="max-width: 800px; max-height: 85vh;">
@@ -203,23 +200,14 @@
   </div>
 
   <!-- ═══ Initialization ═══ -->
+  <script src="js/app-config.js"></script>
   <script src="js/firebase.js"></script>
-  <script src="js/booking-package.js"></script>
-  <script src="js/payment.js"></script>
-  <script src="js/booking-checkout.js"></script>
 
   <script>
     (function () {
       'use strict';
 
       let userUID = null;
-
-      fetch('components/checkout.html')
-        .then((r) => r.text())
-        .then((html) => { document.getElementById('checkoutMount').innerHTML = html; })
-        .catch(() => {
-          document.getElementById('checkoutMount').innerHTML = '<div class="empty">Checkout failed to load. Please refresh the page.</div>';
-        });
 
       // 1. Auth Guard
       firebase.auth().onAuthStateChanged(async (user) => {
@@ -252,8 +240,21 @@
 
         // Load dynamic packages
         loadPackages();
-        // Load bookings
         loadBookings();
+        handlePaymentReturn();
+      }
+
+      function handlePaymentReturn() {
+        const status = new URLSearchParams(window.location.search).get('payment');
+        if (!status) return;
+        const sub = document.querySelector('.db-header-left p');
+        if (status === 'success' && sub) {
+          sub.textContent = 'Payment successful — bookings update to Paid after Stripe confirms (usually seconds).';
+        } else if (status === 'cancelled' && sub) {
+          sub.textContent = 'Checkout was cancelled. You can pay anytime from My Bookings.';
+        }
+        const clean = window.location.pathname + (window.location.hash || '');
+        window.history.replaceState({}, '', clean);
       }
 
       async function loadPackages() {
@@ -273,7 +274,7 @@
                 <p>${pkg.duration}</p>
                 <div class="db-card-footer">
                   <span class="price">₹${pkg.pricePerPerson.toLocaleString()}</span>
-                  <button class="btn-primary btn-sm" onclick="window.AshtaCheckout.open('${pkg.id}')">Book</button>
+                  <a class="btn-primary btn-sm" href="/#booking">Book</a>
                 </div>
               </div>
             </div>`;
@@ -286,7 +287,8 @@
         const overviewGrid = document.getElementById('overviewBookings');
         const tripsList = document.getElementById('tripsList');
         
-        document.getElementById('statUpcoming').textContent = `${bookings.filter(b => String(b.status || '').toUpperCase() === 'CONFIRMED').length} Trips`;
+        const paidCount = bookings.filter(b => String(b.paymentStatus || '').toLowerCase() === 'paid').length;
+        document.getElementById('statUpcoming').textContent = `${paidCount} trip${paidCount === 1 ? '' : 's'}`;
         
         if (bookings.length === 0) {
           const empty = '<p class="empty">No bookings found yet. Start exploring the Seven Sisters!</p>';
@@ -301,33 +303,35 @@
 
         bookings.forEach(b => {
           const rawHtml = b.itineraryText || '';
-          const stripped = window.AshtaBookingPackage && typeof window.AshtaBookingPackage.stripMeta === 'function'
-            ? window.AshtaBookingPackage.stripMeta(rawHtml)
-            : rawHtml;
+          const stripped = rawHtml;
           const hasItinerary = stripped.length > 0;
           if (rawHtml.length > 0) window._itineraries[b.id] = rawHtml;
 
-          const src = window.AshtaBookingPackage && typeof window.AshtaBookingPackage.displaySource === 'function'
-            ? window.AshtaBookingPackage.displaySource(b)
-            : 'PREDEFINED';
-          const srcLabel = src === 'AI' ? 'AI' : 'PREDEFINED';
-          const dateStr = b.createdAt
-            ? new Date(b.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+          const src = b.aiPlanId ? 'AI' : 'PKG';
+          const srcLabel = src === 'AI' ? 'AI plan' : 'Package';
+          const dateValue = b.createdAt && typeof b.createdAt.toDate === 'function' ? b.createdAt.toDate() : b.createdAt;
+          const dateStr = dateValue
+            ? new Date(dateValue).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
             : (b.travelDate ? String(b.travelDate) : '—');
-          const st = String(b.status || 'confirmed');
-          const stClass = st.toLowerCase().replace(/\s+/g, '-');
+          const pay = String(b.paymentStatus || '').toLowerCase();
+          const stClass = pay === 'paid' ? 'confirmed' : 'pending';
+          const stText = pay === 'paid' ? 'Paid' : pay === 'pending' ? 'Payment pending' : (pay || 'Booked');
+
+          const tripTitle = b.packageName
+            || (b.aiPlanId ? 'AI custom itinerary' : null)
+            || (b.packageId ? `Package · ${b.packageId}` : 'Seven Sisters trip');
 
           const item = `
             <div class="db-list-item">
               <div class="item-info">
-                <h4>${b.packageName}</h4>
+                <h4>${tripTitle}</h4>
                 <p class="db-booking-meta"><span class="db-source-tag">${srcLabel}</span> · Booked ${dateStr}</p>
                 <p class="db-booking-ref">Travel: ${b.travelDate || '—'} · Ref ASHTA-${String(b.id).padStart(6, '0')}</p>
               </div>
-              <div class="item-status status-${stClass}">${st.toUpperCase()}</div>
+              <div class="item-status status-${stClass}">${stText}</div>
               <div class="item-price">
-                ₹${parseFloat(b.totalAmount).toLocaleString()}
-                ${hasItinerary ? `<button class="btn-outline btn-xs" style="margin-top:8px; display:block;" onclick='viewItinerary(${b.id})'>View Itinerary</button>` : ''}
+                ₹${parseFloat(b.totalPrice || b.totalAmount || 0).toLocaleString()}
+                ${hasItinerary ? `<button class="btn-outline btn-xs" style="margin-top:8px; display:block;" onclick='viewItinerary("${b.id}")'>View Itinerary</button>` : ''}
               </div>
             </div>`;
           
@@ -339,9 +343,7 @@
       window.viewItinerary = (id) => {
           const raw = window._itineraries[id];
           if (!raw) return;
-          const html = window.AshtaBookingPackage && typeof window.AshtaBookingPackage.stripMeta === 'function'
-            ? window.AshtaBookingPackage.stripMeta(raw)
-            : raw;
+          const html = raw;
           const overlay = document.getElementById('itineraryOverlay');
           const content = document.getElementById('itineraryContent');
           content.innerHTML = html;
